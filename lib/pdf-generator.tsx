@@ -118,9 +118,9 @@ export function generateInvoicePDF(invoice: any) {
     </head>
     <body>
       <div class="header">
-        <div class="studio-name">PhotoStudio Pro</div>
+        <div class="studio-name">Pixel Production</div>
         <div class="contact-info">
-          Contact: 98XXXXXXXX | Address: Kathmandu, Nepal<br>
+          Contact: 9869317165 | Address: Kathmandu, Nepal<br>
           Professional Photo Services
         </div>
       </div>
@@ -218,8 +218,8 @@ export function generateInvoicePDF(invoice: any) {
       </div>
 
       <div class="footer">
-        <p>✓ Thank you for choosing PhotoStudio Pro!</p>
-        <p>For any queries, please contact us at 98XXXXXXXX</p>
+        <p>✓ Thank you for choosing Pixel Production!</p>
+        <p>For any queries, please contact us at 9869317165</p>
       </div>
     </body>
     </html>
