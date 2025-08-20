@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Camera, FileText, TrendingUp, Users, Plus, Search } from "lucide-react"
+import { Camera, FileText, TrendingUp, Users, Plus, Search, Send, ShoppingCart } from "lucide-react"
 import { QuickBillForm } from "@/components/quick-bill-form"
 import { DetailedBillForm } from "@/components/detailed-bill-form"
 import { InvoiceHistory } from "@/components/invoice-history"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { CustomerManagement } from "@/components/customer-management"
+import LabManagement from "@/components/lab-management"
+import ShoppingList from "@/components/shopping-list"
 
 interface Invoice {
   id: string
@@ -138,7 +140,7 @@ export default function PhotoStudioBilling() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-fit lg:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7 lg:w-fit lg:grid-cols-7">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               Dashboard
@@ -158,6 +160,14 @@ export default function PhotoStudioBilling() {
             <TabsTrigger value="customers" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Customers
+            </TabsTrigger>
+            <TabsTrigger value="lab" className="flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              Lab
+            </TabsTrigger>
+            <TabsTrigger value="shopping" className="flex items-center gap-2">
+              <ShoppingCart className="w-4 h-4" />
+              Shopping
             </TabsTrigger>
           </TabsList>
 
@@ -203,6 +213,14 @@ export default function PhotoStudioBilling() {
 
           <TabsContent value="customers">
             <CustomerManagement customers={customers} invoices={invoices} />
+          </TabsContent>
+
+          <TabsContent value="lab">
+            <LabManagement />
+          </TabsContent>
+
+          <TabsContent value="shopping">
+            <ShoppingList />
           </TabsContent>
         </Tabs>
       </main>
