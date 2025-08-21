@@ -17,7 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
-import { Plus, Package, Clock, CheckCircle, XCircle, Trash2 } from "lucide-react"
+import { Plus, Package, Clock, CheckCircle, XCircle, Trash2, ShoppingBag } from "lucide-react"
 
 interface OrderProduct {
   id: string
@@ -38,6 +38,7 @@ interface PendingOrder {
   advance: number
   remaining: number
   status: "pending" | "in-progress" | "ready" | "completed" | "cancelled"
+  pickupStatus: "not-picked-up" | "picked-up"
   orderDate: string
   expectedDate?: string
   notes?: string
@@ -62,7 +63,6 @@ export default function PendingOrders() {
     notes: "",
   })
 
-  // Load orders from localStorage
   useEffect(() => {
     const savedOrders = localStorage.getItem("studio-pending-orders")
     if (savedOrders) {
@@ -70,7 +70,6 @@ export default function PendingOrders() {
     }
   }, [])
 
-  // Save orders to localStorage
   useEffect(() => {
     localStorage.setItem("studio-pending-orders", JSON.stringify(orders))
   }, [orders])
@@ -109,6 +108,7 @@ export default function PendingOrders() {
       advance: newOrder.advance,
       remaining: totalAmount - newOrder.advance,
       status: "pending",
+      pickupStatus: "not-picked-up",
       orderDate: new Date().toISOString().split("T")[0],
       expectedDate: newOrder.expectedDate || undefined,
       notes: newOrder.notes || undefined,
@@ -121,6 +121,10 @@ export default function PendingOrders() {
 
   const updateOrderStatus = (orderId: string, status: PendingOrder["status"]) => {
     setOrders(orders.map((order) => (order.id === orderId ? { ...order, status } : order)))
+  }
+
+  const updatePickupStatus = (orderId: string, pickupStatus: PendingOrder["pickupStatus"]) => {
+    setOrders(orders.map((order) => (order.id === orderId ? { ...order, pickupStatus } : order)))
   }
 
   const deleteOrder = (orderId: string) => {
@@ -168,11 +172,32 @@ export default function PendingOrders() {
     }
   }
 
+  const getPickupStatusColor = (pickupStatus: PendingOrder["pickupStatus"]) => {
+    switch (pickupStatus) {
+      case "not-picked-up":
+        return "bg-orange-100 text-orange-800 border-orange-200"
+      case "picked-up":
+        return "bg-green-100 text-green-800 border-green-200"
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200"
+    }
+  }
+
+  const getPickupStatusIcon = (pickupStatus: PendingOrder["pickupStatus"]) => {
+    switch (pickupStatus) {
+      case "not-picked-up":
+        return <Package className="w-4 h-4" />
+      case "picked-up":
+        return <ShoppingBag className="w-4 h-4" />
+      default:
+        return <Package className="w-4 h-4" />
+    }
+  }
+
   const totalOrderValue = orderProducts.reduce((sum, p) => sum + p.total, 0)
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold font-serif">Pending Orders</h2>
@@ -192,7 +217,6 @@ export default function PendingOrders() {
             </DialogHeader>
 
             <div className="space-y-6">
-              {/* Customer Details */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="customerName">Customer Name</Label>
@@ -248,7 +272,6 @@ export default function PendingOrders() {
 
               <Separator />
 
-              {/* Add Products */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">Add Products</h3>
                 <div className="grid grid-cols-4 gap-4 mb-4">
@@ -300,7 +323,6 @@ export default function PendingOrders() {
                 </div>
               </div>
 
-              {/* Products List */}
               {orderProducts.length > 0 && (
                 <div>
                   <h4 className="font-medium mb-3">Order Items</h4>
@@ -355,7 +377,6 @@ export default function PendingOrders() {
         </Dialog>
       </div>
 
-      {/* Orders Grid */}
       <div className="grid gap-4">
         {orders.length === 0 ? (
           <Card>
@@ -383,6 +404,10 @@ export default function PendingOrders() {
                         {getStatusIcon(order.status)}
                         {order.status.replace("-", " ").toUpperCase()}
                       </Badge>
+                      <Badge className={getPickupStatusColor(order.pickupStatus)}>
+                        {getPickupStatusIcon(order.pickupStatus)}
+                        {order.pickupStatus === "picked-up" ? "PICKED UP" : "AWAITING PICKUP"}
+                      </Badge>
                     </CardTitle>
                     <CardDescription>
                       {order.customerName} • {order.customerPhone}
@@ -404,6 +429,18 @@ export default function PendingOrders() {
                         <SelectItem value="cancelled">Cancelled</SelectItem>
                       </SelectContent>
                     </Select>
+                    <Select
+                      value={order.pickupStatus}
+                      onValueChange={(value) => updatePickupStatus(order.id, value as PendingOrder["pickupStatus"])}
+                    >
+                      <SelectTrigger className="w-36">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="not-picked-up">Not Picked Up</SelectItem>
+                        <SelectItem value="picked-up">Picked Up</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Button variant="ghost" size="sm" onClick={() => deleteOrder(order.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -412,7 +449,6 @@ export default function PendingOrders() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* Order Details */}
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Order Date:</span>
@@ -426,7 +462,6 @@ export default function PendingOrders() {
                     )}
                   </div>
 
-                  {/* Products */}
                   <div>
                     <h4 className="font-medium mb-2">Items ({order.products.length})</h4>
                     <div className="space-y-2">
@@ -444,7 +479,6 @@ export default function PendingOrders() {
                     </div>
                   </div>
 
-                  {/* Financial Summary */}
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-semibold">Total Amount:</span>
