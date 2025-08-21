@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Plus, Trash2, FileText, Download } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
@@ -37,6 +38,8 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
   const [items, setItems] = useState<Item[]>([{ name: "", quantity: 1, rate: 0, total: 0 }])
   const [advance, setAdvance] = useState("")
   const [discount, setDiscount] = useState("")
+  const [createOrderInfo, setCreateOrderInfo] = useState(false)
+  const [photoNumber, setPhotoNumber] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
@@ -87,6 +90,15 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       return
     }
 
+    if (createOrderInfo && !photoNumber.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter photo number for order info",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsSubmitting(true)
 
     const invoice = {
@@ -99,6 +111,13 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       remaining: remaining,
       status: remaining <= 0 ? ("paid" as const) : ("pending" as const),
       discount: discountAmount,
+      orderInfo: createOrderInfo
+        ? {
+            photoNumber: photoNumber.trim(),
+            totalAmount: finalTotal,
+            advance: advanceAmount,
+          }
+        : undefined,
     }
 
     onSubmit(invoice)
@@ -108,12 +127,13 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       description: "Detailed bill created successfully",
     })
 
-    // Reset form
     setCustomerPhone("")
     setCustomerName("")
     setItems([{ name: "", quantity: 1, rate: 0, total: 0 }])
     setAdvance("")
     setDiscount("")
+    setCreateOrderInfo(false)
+    setPhotoNumber("")
     setIsSubmitting(false)
   }
 
@@ -132,6 +152,13 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       date: new Date().toISOString().split("T")[0],
       status: remaining <= 0 ? ("paid" as const) : ("pending" as const),
       discount: discountAmount,
+      orderInfo: createOrderInfo
+        ? {
+            photoNumber: photoNumber.trim(),
+            totalAmount: finalTotal,
+            advance: advanceAmount,
+          }
+        : undefined,
     }
 
     generateInvoicePDF(invoice)
@@ -228,6 +255,42 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* Order Information */}
+      <Card className="bg-muted/20">
+        <CardHeader>
+          <CardTitle className="text-lg">Order Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-2 mb-4">
+            <Checkbox
+              id="create-order-info"
+              checked={createOrderInfo}
+              onCheckedChange={(checked) => setCreateOrderInfo(checked as boolean)}
+            />
+            <Label htmlFor="create-order-info" className="text-sm font-medium">
+              Create Order Info (Small printable label for frames)
+            </Label>
+          </div>
+
+          {createOrderInfo && (
+            <div className="space-y-2">
+              <Label htmlFor="photo-number">Photo Number *</Label>
+              <Input
+                id="photo-number"
+                placeholder="e.g., P001, Frame-12, etc."
+                value={photoNumber}
+                onChange={(e) => setPhotoNumber(e.target.value)}
+                required={createOrderInfo}
+              />
+              <p className="text-xs text-muted-foreground">
+                This will create a small label with invoice number, total amount, advance, and photo number for pasting
+                on frames.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

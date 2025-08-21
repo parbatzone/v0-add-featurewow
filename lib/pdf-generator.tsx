@@ -7,6 +7,37 @@ export function generateInvoicePDF(invoice: any) {
     return
   }
 
+  const orderInfoHTML = invoice.orderInfo
+    ? `
+    <div class="order-info-label">
+      <div class="label-header">PIXEL PRODUCTION</div>
+      <div class="label-content">
+        <div class="label-row">
+          <span>Invoice:</span>
+          <span>${invoice.id}</span>
+        </div>
+        <div class="label-row">
+          <span>Photo:</span>
+          <span>${invoice.orderInfo.photoNumber}</span>
+        </div>
+        <div class="label-row">
+          <span>Total:</span>
+          <span>NPR ${invoice.orderInfo.totalAmount.toLocaleString()}</span>
+        </div>
+        <div class="label-row">
+          <span>Advance:</span>
+          <span>NPR ${invoice.orderInfo.advance.toLocaleString()}</span>
+        </div>
+        <div class="label-row remaining">
+          <span>Balance:</span>
+          <span>NPR ${(invoice.orderInfo.totalAmount - invoice.orderInfo.advance).toLocaleString()}</span>
+        </div>
+      </div>
+      <div class="label-footer">9869317165</div>
+    </div>
+  `
+    : ""
+
   const invoiceHTML = `
     <!DOCTYPE html>
     <html>
@@ -111,8 +142,57 @@ export function generateInvoicePDF(invoice: any) {
           background-color: #dc2626;
           color: white;
         }
+        
+        /* Added order info label styles */
+        .order-info-label {
+          width: 200px;
+          height: 120px;
+          border: 2px solid #059669;
+          margin: 30px auto;
+          padding: 8px;
+          font-size: 10px;
+          background: white;
+          page-break-inside: avoid;
+        }
+        .label-header {
+          text-align: center;
+          font-weight: bold;
+          color: #059669;
+          font-size: 11px;
+          margin-bottom: 6px;
+          border-bottom: 1px solid #059669;
+          padding-bottom: 2px;
+        }
+        .label-content {
+          margin-bottom: 6px;
+        }
+        .label-row {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 2px;
+          font-size: 9px;
+        }
+        .label-row.remaining {
+          font-weight: bold;
+          color: #dc2626;
+          border-top: 1px solid #ddd;
+          padding-top: 2px;
+          margin-top: 4px;
+        }
+        .label-footer {
+          text-align: center;
+          font-size: 8px;
+          color: #666;
+          border-top: 1px solid #ddd;
+          padding-top: 2px;
+        }
+        
         @media print {
           body { margin: 0; }
+          .order-info-label {
+            page-break-before: always;
+            margin: 20px auto;
+          }
         }
       </style>
     </head>
@@ -221,6 +301,8 @@ export function generateInvoicePDF(invoice: any) {
         <p>✓ Thank you for choosing Pixel Production!</p>
         <p>For any queries, please contact us at 9869317165</p>
       </div>
+
+      ${orderInfoHTML}
     </body>
     </html>
   `

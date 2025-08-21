@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Zap, Download } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
@@ -20,6 +21,8 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
   const [price, setPrice] = useState("")
   const [advance, setAdvance] = useState("")
   const [customerPhone, setCustomerPhone] = useState("")
+  const [createOrderInfo, setCreateOrderInfo] = useState(false)
+  const [photoNumber, setPhotoNumber] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
@@ -31,6 +34,15 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
       toast({
         title: "Error",
         description: "Please enter a valid price",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (createOrderInfo && !photoNumber.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter photo number for order info",
         variant: "destructive",
       })
       return
@@ -53,6 +65,13 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
       advance: Number.parseFloat(advance || "0"),
       remaining: remaining,
       status: remaining <= 0 ? ("paid" as const) : ("pending" as const),
+      orderInfo: createOrderInfo
+        ? {
+            photoNumber: photoNumber.trim(),
+            totalAmount: Number.parseFloat(price),
+            advance: Number.parseFloat(advance || "0"),
+          }
+        : undefined,
     }
 
     onSubmit(invoice)
@@ -66,6 +85,8 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
     setPrice("")
     setAdvance("")
     setCustomerPhone("")
+    setCreateOrderInfo(false)
+    setPhotoNumber("")
     setIsSubmitting(false)
   }
 
@@ -89,6 +110,13 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
       remaining: remaining,
       date: new Date().toISOString().split("T")[0],
       status: remaining <= 0 ? ("paid" as const) : ("pending" as const),
+      orderInfo: createOrderInfo
+        ? {
+            photoNumber: photoNumber.trim(),
+            totalAmount: Number.parseFloat(price),
+            advance: Number.parseFloat(advance || "0"),
+          }
+        : undefined,
     }
 
     generateInvoicePDF(invoice)
@@ -129,6 +157,38 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
           onChange={(e) => setAdvance(e.target.value)}
         />
       </div>
+
+      <Card className="bg-muted/20">
+        <CardContent className="pt-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <Checkbox
+              id="create-order-info"
+              checked={createOrderInfo}
+              onCheckedChange={(checked) => setCreateOrderInfo(checked as boolean)}
+            />
+            <Label htmlFor="create-order-info" className="text-sm font-medium">
+              Create Order Info (Small printable label for frames)
+            </Label>
+          </div>
+
+          {createOrderInfo && (
+            <div className="space-y-2">
+              <Label htmlFor="photo-number">Photo Number *</Label>
+              <Input
+                id="photo-number"
+                placeholder="e.g., P001, Frame-12, etc."
+                value={photoNumber}
+                onChange={(e) => setPhotoNumber(e.target.value)}
+                required={createOrderInfo}
+              />
+              <p className="text-xs text-muted-foreground">
+                This will create a small label with invoice number, total amount, advance, and photo number for pasting
+                on frames.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {price && (
         <Card className="bg-muted/50">
