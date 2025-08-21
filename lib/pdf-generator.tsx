@@ -9,31 +9,36 @@ export function generateInvoicePDF(invoice: any) {
 
   const orderInfoHTML = invoice.orderInfo
     ? `
-    <div class="order-info-label">
-      <div class="label-header">PIXEL PRODUCTION</div>
-      <div class="label-content">
-        <div class="label-row">
-          <span>Invoice:</span>
-          <span>${invoice.id}</span>
+    <div class="order-info-section">
+      <div class="order-info-label">
+        <div class="label-header">
+          <img src="/images/pixel-production-logo.jpg" alt="Pixel Production" class="label-logo">
+          <div class="label-title">PIXEL PRODUCTION</div>
         </div>
-        <div class="label-row">
-          <span>Photo:</span>
-          <span>${invoice.orderInfo.photoNumber}</span>
+        <div class="label-content">
+          <div class="label-row">
+            <span>Invoice:</span>
+            <span>${invoice.id}</span>
+          </div>
+          <div class="label-row">
+            <span>Photo:</span>
+            <span>${invoice.orderInfo.photoNumber}</span>
+          </div>
+          <div class="label-row">
+            <span>Total:</span>
+            <span>NPR ${invoice.orderInfo.totalAmount.toLocaleString()}</span>
+          </div>
+          <div class="label-row">
+            <span>Advance:</span>
+            <span>NPR ${invoice.orderInfo.advance.toLocaleString()}</span>
+          </div>
+          <div class="label-row remaining">
+            <span>Balance:</span>
+            <span>NPR ${(invoice.orderInfo.totalAmount - invoice.orderInfo.advance).toLocaleString()}</span>
+          </div>
         </div>
-        <div class="label-row">
-          <span>Total:</span>
-          <span>NPR ${invoice.orderInfo.totalAmount.toLocaleString()}</span>
-        </div>
-        <div class="label-row">
-          <span>Advance:</span>
-          <span>NPR ${invoice.orderInfo.advance.toLocaleString()}</span>
-        </div>
-        <div class="label-row remaining">
-          <span>Balance:</span>
-          <span>NPR ${(invoice.orderInfo.totalAmount - invoice.orderInfo.advance).toLocaleString()}</span>
-        </div>
+        <div class="label-footer">9869317165</div>
       </div>
-      <div class="label-footer">9869317165</div>
     </div>
   `
     : ""
@@ -56,6 +61,18 @@ export function generateInvoicePDF(invoice: any) {
           border-bottom: 2px solid #059669;
           padding-bottom: 20px;
           margin-bottom: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 20px;
+        }
+        .header-logo {
+          width: 60px;
+          height: 60px;
+          object-fit: contain;
+        }
+        .header-text {
+          text-align: left;
         }
         .studio-name {
           font-size: 28px;
@@ -143,28 +160,41 @@ export function generateInvoicePDF(invoice: any) {
           color: white;
         }
         
-        /* Added order info label styles */
+        /* Updated order info styles for same-page printing with logo */
+        .order-info-section {
+          margin-top: 40px;
+          page-break-inside: avoid;
+          display: flex;
+          justify-content: center;
+        }
         .order-info-label {
           width: 200px;
-          height: 120px;
+          height: 140px;
           border: 2px solid #059669;
-          margin: 30px auto;
           padding: 8px;
           font-size: 10px;
           background: white;
-          page-break-inside: avoid;
+          box-sizing: border-box;
         }
         .label-header {
           text-align: center;
+          margin-bottom: 8px;
+          border-bottom: 1px solid #059669;
+          padding-bottom: 4px;
+        }
+        .label-logo {
+          width: 20px;
+          height: 20px;
+          object-fit: contain;
+          margin-bottom: 2px;
+        }
+        .label-title {
           font-weight: bold;
           color: #059669;
-          font-size: 11px;
-          margin-bottom: 6px;
-          border-bottom: 1px solid #059669;
-          padding-bottom: 2px;
+          font-size: 10px;
         }
         .label-content {
-          margin-bottom: 6px;
+          margin-bottom: 8px;
         }
         .label-row {
           display: flex;
@@ -189,19 +219,26 @@ export function generateInvoicePDF(invoice: any) {
         
         @media print {
           body { margin: 0; }
-          .order-info-label {
-            page-break-before: always;
-            margin: 20px auto;
+          .order-info-section {
+            margin-top: 30px;
+          }
+          /* Only break to new page if invoice is very long */
+          @page {
+            size: A4;
+            margin: 1cm;
           }
         }
       </style>
     </head>
     <body>
       <div class="header">
-        <div class="studio-name">Pixel Production</div>
-        <div class="contact-info">
-          Contact: 9869317165 | Address: Kathmandu, Nepal<br>
-          Professional Photo Services
+        <img src="/images/pixel-production-logo.jpg" alt="Pixel Production Logo" class="header-logo">
+        <div class="header-text">
+          <div class="studio-name">Pixel Production</div>
+          <div class="contact-info">
+            Contact: 9869317165 | Address: Kathmandu, Nepal<br>
+            Professional Photo Services
+          </div>
         </div>
       </div>
 
