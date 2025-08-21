@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Camera, FileText, TrendingUp, Users, Plus, Search, Send, ShoppingCart } from "lucide-react"
+import { Camera, FileText, TrendingUp, Users, Plus, Search, Send, ShoppingCart, Package } from "lucide-react"
 import { QuickBillForm } from "@/components/quick-bill-form"
 import { DetailedBillForm } from "@/components/detailed-bill-form"
 import { InvoiceHistory } from "@/components/invoice-history"
@@ -12,6 +12,7 @@ import { DashboardStats } from "@/components/dashboard-stats"
 import { CustomerManagement } from "@/components/customer-management"
 import LabManagement from "@/components/lab-management"
 import ShoppingList from "@/components/shopping-list"
+import PendingOrders from "@/components/pending-orders"
 
 interface Invoice {
   id: string
@@ -140,7 +141,7 @@ export default function PhotoStudioBilling() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-fit lg:grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8 lg:w-fit lg:grid-cols-8">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               Dashboard
@@ -152,6 +153,10 @@ export default function PhotoStudioBilling() {
             <TabsTrigger value="detailed-bill" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               Detailed Bill
+            </TabsTrigger>
+            <TabsTrigger value="pending-orders" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              Orders
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <Search className="w-4 h-4" />
@@ -205,6 +210,10 @@ export default function PhotoStudioBilling() {
                 <DetailedBillForm onSubmit={addInvoice} customers={customers} />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="pending-orders">
+            <PendingOrders />
           </TabsContent>
 
           <TabsContent value="history">
