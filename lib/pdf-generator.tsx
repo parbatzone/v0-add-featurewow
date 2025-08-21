@@ -55,6 +55,7 @@ export function generateInvoicePDF(invoice: any) {
           margin: 0 auto;
           padding: 20px;
           line-height: 1.6;
+          position: relative;
         }
         .header {
           text-align: center;
@@ -84,10 +85,33 @@ export function generateInvoicePDF(invoice: any) {
           color: #666;
           font-size: 14px;
         }
+        .stamp-logo {
+          position: absolute;
+          top: 200px;
+          right: 50px;
+          width: 120px;
+          height: 120px;
+          opacity: 0.15;
+          transform: rotate(-15deg);
+          border: 3px solid #059669;
+          border-radius: 50%;
+          padding: 15px;
+          background: rgba(5, 150, 105, 0.05);
+          box-shadow: 0 0 0 2px #059669;
+          z-index: 1;
+        }
+        .stamp-logo img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          filter: sepia(1) hue-rotate(120deg) saturate(2);
+        }
         .invoice-details {
           display: flex;
           justify-content: space-between;
           margin-bottom: 30px;
+          position: relative;
+          z-index: 2;
         }
         .invoice-info, .customer-info {
           flex: 1;
@@ -159,8 +183,6 @@ export function generateInvoicePDF(invoice: any) {
           background-color: #dc2626;
           color: white;
         }
-        
-        /* Updated order info styles for same-page printing with logo */
         .order-info-section {
           margin-top: 40px;
           page-break-inside: avoid;
@@ -215,13 +237,14 @@ export function generateInvoicePDF(invoice: any) {
           padding-top: 4px;
           margin-top: 6px;
         }
-        
         @media print {
           body { margin: 0; }
           .order-info-section {
             margin-top: 30px;
           }
-          /* Only break to new page if invoice is very long */
+          .stamp-logo {
+            opacity: 0.1;
+          }
           @page {
             size: A4;
             margin: 1cm;
@@ -239,6 +262,10 @@ export function generateInvoicePDF(invoice: any) {
             Professional Photo Services
           </div>
         </div>
+      </div>
+
+      <div class="stamp-logo">
+        <img src="/images/pixel-production-logo.jpg" alt="Pixel Production Stamp">
       </div>
 
       <div class="invoice-details">
