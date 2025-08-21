@@ -14,6 +14,7 @@ export function generateInvoicePDF(invoice: any) {
         <div class="label-header">
           <img src="/images/pixel-production-logo.jpg" alt="Pixel Production" class="label-logo">
           <div class="label-title">PIXEL PRODUCTION</div>
+          <div class="label-phone">9869317165</div>
         </div>
         <div class="label-content">
           <div class="label-row">
@@ -37,7 +38,6 @@ export function generateInvoicePDF(invoice: any) {
             <span>NPR ${(invoice.orderInfo.totalAmount - invoice.orderInfo.advance).toLocaleString()}</span>
           </div>
         </div>
-        <div class="label-footer">9869317165</div>
       </div>
     </div>
   `
@@ -168,53 +168,52 @@ export function generateInvoicePDF(invoice: any) {
           justify-content: center;
         }
         .order-info-label {
-          width: 200px;
-          height: 140px;
+          width: 280px;
+          height: 180px;
           border: 2px solid #059669;
-          padding: 8px;
-          font-size: 10px;
+          padding: 12px;
+          font-size: 12px;
           background: white;
           box-sizing: border-box;
         }
         .label-header {
           text-align: center;
-          margin-bottom: 8px;
+          margin-bottom: 10px;
           border-bottom: 1px solid #059669;
-          padding-bottom: 4px;
+          padding-bottom: 6px;
         }
         .label-logo {
-          width: 20px;
-          height: 20px;
+          width: 24px;
+          height: 24px;
           object-fit: contain;
-          margin-bottom: 2px;
+          margin-bottom: 4px;
         }
         .label-title {
           font-weight: bold;
           color: #059669;
+          font-size: 12px;
+          margin-bottom: 2px;
+        }
+        .label-phone {
           font-size: 10px;
+          color: #666;
+          font-weight: normal;
         }
         .label-content {
-          margin-bottom: 8px;
+          margin-bottom: 10px;
         }
         .label-row {
           display: flex;
           justify-content: space-between;
-          margin-bottom: 2px;
-          font-size: 9px;
+          margin-bottom: 4px;
+          font-size: 11px;
         }
         .label-row.remaining {
           font-weight: bold;
           color: #dc2626;
           border-top: 1px solid #ddd;
-          padding-top: 2px;
-          margin-top: 4px;
-        }
-        .label-footer {
-          text-align: center;
-          font-size: 8px;
-          color: #666;
-          border-top: 1px solid #ddd;
-          padding-top: 2px;
+          padding-top: 4px;
+          margin-top: 6px;
         }
         
         @media print {
