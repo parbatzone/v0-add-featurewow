@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Download } from "lucide-react"
+import { Search, Download, Trash2 } from "lucide-react"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
 
 interface InvoiceHistoryProps {
@@ -67,6 +67,12 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
         inv.id === invoiceId ? { ...inv, status: "paid" as const, remaining: 0, advance: inv.subtotal } : inv,
       ),
     )
+  }
+
+  const deleteInvoice = (invoiceId: string) => {
+    if (confirm("Are you sure you want to delete this invoice? This action cannot be undone.")) {
+      setInvoices(invoices.filter((inv) => inv.id !== invoiceId))
+    }
   }
 
   const totalAmount = filteredInvoices.reduce((sum, inv) => sum + inv.subtotal, 0)
@@ -186,6 +192,10 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
                         Mark Paid
                       </Button>
                     )}
+                    <Button size="sm" variant="destructive" onClick={() => deleteInvoice(invoice.id)}>
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
               </div>
