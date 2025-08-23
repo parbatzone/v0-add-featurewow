@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Camera, FileText, TrendingUp, Users, Plus, Search, Send, ShoppingCart, Package } from "lucide-react"
+import { Camera, FileText, TrendingUp, Users, Plus, Search, Send, ShoppingCart, Package, Sparkles } from "lucide-react"
 import { QuickBillForm } from "@/components/quick-bill-form"
 import { DetailedBillForm } from "@/components/detailed-bill-form"
 import { InvoiceHistory } from "@/components/invoice-history"
@@ -115,76 +115,120 @@ export default function PhotoStudioBilling() {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-chart-1/10 rounded-full blur-2xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-accent/5 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
+
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="relative border-b glass-effect decorative-border">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
-                <Camera className="w-6 h-6 text-primary-foreground" />
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-chart-1 rounded-xl glow-effect">
+                  <Camera className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-chart-1 rounded-full animate-ping opacity-75"></div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold font-serif text-foreground">PhotoStudio Pro</h1>
-                <p className="text-sm text-muted-foreground">Professional Billing Software</p>
+                <h1 className="text-3xl font-bold font-space-grotesk bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                  Pixel Production
+                </h1>
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  Professional Billing Software
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="glass-effect border-primary/20 text-primary font-medium px-3 py-1">
                 Today: NPR {todaysSales.toLocaleString()}
               </Badge>
-              {pendingAmount > 0 && <Badge variant="destructive">Pending: NPR {pendingAmount.toLocaleString()}</Badge>}
+              {pendingAmount > 0 && (
+                <Badge variant="destructive" className="glass-effect animate-pulse">
+                  Pending: NPR {pendingAmount.toLocaleString()}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 lg:w-fit lg:grid-cols-8">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="quick-bill" className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Quick Bill
-            </TabsTrigger>
-            <TabsTrigger value="detailed-bill" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Detailed Bill
-            </TabsTrigger>
-            <TabsTrigger value="pending-orders" className="flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Orders
-            </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <Search className="w-4 h-4" />
-              History
-            </TabsTrigger>
-            <TabsTrigger value="customers" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Customers
-            </TabsTrigger>
-            <TabsTrigger value="lab" className="flex items-center gap-2">
-              <Send className="w-4 h-4" />
-              Lab
-            </TabsTrigger>
-            <TabsTrigger value="shopping" className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4" />
-              Shopping
-            </TabsTrigger>
-          </TabsList>
+      <main className="relative container mx-auto px-4 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <div className="relative">
+            <TabsList className="grid w-full grid-cols-8 lg:w-fit lg:grid-cols-8 glass-effect border border-border/50 p-1">
+              <TabsTrigger
+                value="dashboard"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <TrendingUp className="w-4 h-4" />
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger
+                value="quick-bill"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <Plus className="w-4 h-4" />
+                Quick Bill
+              </TabsTrigger>
+              <TabsTrigger
+                value="detailed-bill"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <FileText className="w-4 h-4" />
+                Detailed Bill
+              </TabsTrigger>
+              <TabsTrigger
+                value="pending-orders"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <Package className="w-4 h-4" />
+                Orders
+              </TabsTrigger>
+              <TabsTrigger
+                value="history"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <Search className="w-4 h-4" />
+                History
+              </TabsTrigger>
+              <TabsTrigger
+                value="customers"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <Users className="w-4 h-4" />
+                Customers
+              </TabsTrigger>
+              <TabsTrigger
+                value="lab"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <Send className="w-4 h-4" />
+                Lab
+              </TabsTrigger>
+              <TabsTrigger
+                value="shopping"
+                className="flex items-center gap-2 data-[state=active]:glass-effect data-[state=active]:glow-effect"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Shopping
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="dashboard" className="space-y-6">
             <DashboardStats invoices={invoices} customers={customers} />
           </TabsContent>
 
           <TabsContent value="quick-bill">
-            <Card>
+            <Card className="glass-effect border-border/50 decorative-border">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Plus className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 font-space-grotesk">
+                  <Plus className="w-5 h-5 text-primary" />
                   Quick Entry Mode
                 </CardTitle>
                 <CardDescription>Fast billing for simple transactions - just enter price and advance</CardDescription>
@@ -196,10 +240,10 @@ export default function PhotoStudioBilling() {
           </TabsContent>
 
           <TabsContent value="detailed-bill">
-            <Card>
+            <Card className="glass-effect border-border/50 decorative-border">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 font-space-grotesk">
+                  <FileText className="w-5 h-5 text-primary" />
                   Detailed Entry Mode
                 </CardTitle>
                 <CardDescription>
