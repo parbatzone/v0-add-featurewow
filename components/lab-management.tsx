@@ -66,7 +66,7 @@ export default function LabManagement() {
       orderDate: new Date().toISOString().split("T")[0],
       status: "pending",
     }
-    setLabOrders([...labOrders, order])
+    setLabOrders([order, ...labOrders])
     setNewOrder({
       customerName: "",
       customerPhone: "",
