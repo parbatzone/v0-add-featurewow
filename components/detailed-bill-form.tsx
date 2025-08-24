@@ -40,6 +40,8 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
   const [discount, setDiscount] = useState("")
   const [createOrderInfo, setCreateOrderInfo] = useState(false)
   const [photoNumber, setPhotoNumber] = useState("")
+  const [isLabPhoto, setIsLabPhoto] = useState(false)
+  const [addToOrders, setAddToOrders] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
@@ -118,13 +120,66 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
             advance: advanceAmount,
           }
         : undefined,
+      isLabPhoto,
+      addToOrders,
+    }
+
+    if (isLabPhoto && customerName) {
+      const labEntry = {
+        id: Date.now().toString(),
+        customerName,
+        customerPhone: customerPhone || "",
+        orderDetails: items.map((item) => `${item.name} (${item.quantity})`).join(", "),
+        labName: "",
+        status: "not_sent" as const,
+        priority: "medium" as const,
+        orderDate: new Date().toISOString().split("T")[0],
+        expectedDate: "",
+        notes: `Auto-created from invoice - Total: NPR ${finalTotal.toLocaleString()}`,
+      }
+
+      const existingLabOrders = JSON.parse(localStorage.getItem("labOrders") || "[]")
+      localStorage.setItem("labOrders", JSON.stringify([...existingLabOrders, labEntry]))
+    }
+
+    if (addToOrders && customerName) {
+      const pendingOrder = {
+        id: Date.now().toString(),
+        customerName,
+        customerPhone: customerPhone || "",
+        products: items.map((item) => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.rate,
+        })),
+        totalAmount: finalTotal,
+        advancePaid: advanceAmount,
+        remainingAmount: remaining,
+        status: remaining <= 0 ? "completed" : "pending",
+        orderDate: new Date().toISOString().split("T")[0],
+        deliveryDate: "",
+        pickupStatus: "not_picked_up" as const,
+        notes: `Auto-created from invoice${isLabPhoto ? " - Lab Photo" : ""}`,
+      }
+
+      const existingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]")
+      localStorage.setItem("pendingOrders", JSON.stringify([...existingOrders, pendingOrder]))
     }
 
     onSubmit(invoice)
 
+    let successMessage = "Detailed bill created successfully"
+    if (isLabPhoto && addToOrders) {
+      successMessage += " and added to lab management and pending orders"
+    } else if (isLabPhoto) {
+      successMessage += " and added to lab management"
+    } else if (addToOrders) {
+      successMessage += " and added to pending orders"
+    }
+
     toast({
       title: "Success!",
-      description: "Detailed bill created successfully",
+      description: successMessage,
     })
 
     setCustomerPhone("")
@@ -134,6 +189,8 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
     setDiscount("")
     setCreateOrderInfo(false)
     setPhotoNumber("")
+    setIsLabPhoto(false)
+    setAddToOrders(false)
     setIsSubmitting(false)
   }
 
@@ -159,6 +216,8 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
             advance: advanceAmount,
           }
         : undefined,
+      isLabPhoto,
+      addToOrders,
     }
 
     generateInvoicePDF(invoice)
@@ -255,6 +314,41 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* Auto-Management Options */}
+      <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+        <CardHeader>
+          <CardTitle className="text-lg text-blue-700 dark:text-blue-300">Auto-Management Options</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="is-lab-photo"
+                checked={isLabPhoto}
+                onCheckedChange={(checked) => setIsLabPhoto(checked as boolean)}
+              />
+              <Label htmlFor="is-lab-photo" className="text-sm font-medium">
+                This is a lab photo
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="add-to-orders"
+                checked={addToOrders}
+                onCheckedChange={(checked) => setAddToOrders(checked as boolean)}
+              />
+              <Label htmlFor="add-to-orders" className="text-sm font-medium">
+                Add to pending orders
+              </Label>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Save time by automatically creating entries in Lab Management and Pending Orders sections when creating this
+            bill.
+          </p>
         </CardContent>
       </Card>
 
