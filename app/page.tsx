@@ -13,6 +13,7 @@ import { CustomerManagement } from "@/components/customer-management"
 import LabManagement from "@/components/lab-management"
 import ShoppingList from "@/components/shopping-list"
 import PendingOrders from "@/components/pending-orders"
+import { AnalyticsDashboard } from "@/components/analytics-dashboard"
 
 interface Invoice {
   id: string
@@ -222,6 +223,7 @@ export default function PhotoStudioBilling() {
 
           <TabsContent value="dashboard" className="space-y-6">
             <DashboardStats invoices={invoices} customers={customers} />
+            <AnalyticsDashboard invoices={invoices} />
           </TabsContent>
 
           <TabsContent value="quick-bill">

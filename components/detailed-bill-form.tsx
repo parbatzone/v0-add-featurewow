@@ -129,41 +129,45 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
         id: Date.now().toString(),
         customerName,
         customerPhone: customerPhone || "",
-        orderDetails: items.map((item) => `${item.name} (${item.quantity})`).join(", "),
-        labName: "",
-        status: "not_sent" as const,
-        priority: "medium" as const,
         orderDate: new Date().toISOString().split("T")[0],
-        expectedDate: "",
-        notes: `Auto-created from invoice - Total: NPR ${finalTotal.toLocaleString()}`,
+        dueDate: "",
+        photoType: items.map((item) => item.name).join(", "),
+        quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+        notes: `Auto-created from invoice ${invoice.id || "INV-" + Date.now()} - Total: NPR ${finalTotal.toLocaleString()}`,
+        status: "pending" as const,
+        labName: "",
+        totalAmount: finalTotal,
       }
 
       const existingLabOrders = JSON.parse(localStorage.getItem("labOrders") || "[]")
-      localStorage.setItem("labOrders", JSON.stringify([...existingLabOrders, labEntry]))
+      localStorage.setItem("labOrders", JSON.stringify([labEntry, ...existingLabOrders]))
     }
 
     if (addToOrders && customerName) {
       const pendingOrder = {
-        id: Date.now().toString(),
+        id: `order-${Date.now()}`,
+        orderNumber: `ORD-${String(JSON.parse(localStorage.getItem("studio-pending-orders") || "[]").length + 1).padStart(4, "0")}`,
         customerName,
         customerPhone: customerPhone || "",
         products: items.map((item) => ({
+          id: `prod-${Date.now()}-${Math.random()}`,
           name: item.name,
           quantity: item.quantity,
-          price: item.rate,
+          rate: item.rate,
+          total: item.total,
         })),
         totalAmount: finalTotal,
-        advancePaid: advanceAmount,
-        remainingAmount: remaining,
+        advance: advanceAmount,
+        remaining: remaining,
         status: remaining <= 0 ? "completed" : "pending",
+        pickupStatus: "not-picked-up" as const,
         orderDate: new Date().toISOString().split("T")[0],
-        deliveryDate: "",
-        pickupStatus: "not_picked_up" as const,
+        expectedDate: "",
         notes: `Auto-created from invoice${isLabPhoto ? " - Lab Photo" : ""}`,
       }
 
-      const existingOrders = JSON.parse(localStorage.getItem("pendingOrders") || "[]")
-      localStorage.setItem("pendingOrders", JSON.stringify([...existingOrders, pendingOrder]))
+      const existingOrders = JSON.parse(localStorage.getItem("studio-pending-orders") || "[]")
+      localStorage.setItem("studio-pending-orders", JSON.stringify([pendingOrder, ...existingOrders]))
     }
 
     onSubmit(invoice)
