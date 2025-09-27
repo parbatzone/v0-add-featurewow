@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
@@ -31,6 +32,8 @@ import {
   BarChart3,
   PieChartIcon,
   LineChartIcon,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react"
 
 interface Invoice {
@@ -58,15 +61,44 @@ interface AnalyticsDashboardProps {
 export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
   const [selectedPeriod, setSelectedPeriod] = useState("6months")
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString())
+  const [selectedMonth, setSelectedMonth] = useState("all")
 
-  // Get available years from invoices
+  // Get available years and months from invoices
   const availableYears = useMemo(() => {
     const years = [...new Set(invoices.map((inv) => new Date(inv.date).getFullYear()))]
     return years.sort((a, b) => b - a)
   }, [invoices])
 
-  // Filter invoices based on selected period
+  const availableMonths = useMemo(() => {
+    const months = [
+      ...new Set(
+        invoices.map((inv) => {
+          const date = new Date(inv.date)
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+        }),
+      ),
+    ]
+    return months
+      .sort((a, b) => b.localeCompare(a))
+      .map((monthKey) => {
+        const [year, month] = monthKey.split("-")
+        const date = new Date(Number.parseInt(year), Number.parseInt(month) - 1)
+        return {
+          value: monthKey,
+          label: date.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+        }
+      })
+  }, [invoices])
+
   const filteredInvoices = useMemo(() => {
+    if (selectedMonth !== "all") {
+      return invoices.filter((inv) => {
+        const date = new Date(inv.date)
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+        return monthKey === selectedMonth
+      })
+    }
+
     const now = new Date()
     const startDate = new Date()
 
@@ -90,9 +122,8 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
     }
 
     return invoices.filter((inv) => new Date(inv.date) >= startDate)
-  }, [invoices, selectedPeriod, selectedYear])
+  }, [invoices, selectedPeriod, selectedYear, selectedMonth])
 
-  // Monthly revenue data
   const monthlyData = useMemo(() => {
     const monthlyStats = new Map()
 
@@ -104,10 +135,13 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
       if (!monthlyStats.has(monthKey)) {
         monthlyStats.set(monthKey, {
           month: monthName,
+          monthKey,
           revenue: 0,
           bills: 0,
           paid: 0,
           pending: 0,
+          customers: new Set(),
+          services: new Map(),
         })
       }
 
@@ -119,9 +153,28 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
       } else {
         stats.pending += invoice.remaining
       }
+
+      if (invoice.customerName) {
+        stats.customers.add(invoice.customerName)
+      }
+
+      invoice.items.forEach((item) => {
+        if (!stats.services.has(item.name)) {
+          stats.services.set(item.name, { quantity: 0, revenue: 0 })
+        }
+        const service = stats.services.get(item.name)
+        service.quantity += item.quantity
+        service.revenue += item.total
+      })
     })
 
-    return Array.from(monthlyStats.values()).sort((a, b) => a.month.localeCompare(b.month))
+    return Array.from(monthlyStats.values())
+      .map((stats) => ({
+        ...stats,
+        customers: stats.customers.size,
+        services: Array.from(stats.services.entries()).map(([name, data]) => ({ name, ...data })),
+      }))
+      .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
   }, [filteredInvoices])
 
   // Service/Product analysis
@@ -265,6 +318,120 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
     },
   }
 
+  const exportToCSV = (data: any[], filename: string, headers: string[]) => {
+    const csvContent = [
+      headers.join(","),
+      ...data.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header.toLowerCase().replace(/\s+/g, "")]
+            return typeof value === "string" && value.includes(",") ? `"${value}"` : value
+          })
+          .join(","),
+      ),
+    ].join("\n")
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `${filename}_${new Date().toISOString().split("T")[0]}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const exportMonthlyRevenue = () => {
+    const data = monthlyData.map((month) => ({
+      month: month.month,
+      revenue: month.revenue,
+      bills: month.bills,
+      paid: month.paid,
+      pending: month.pending,
+      customers: month.customers,
+      averagebillvalue: month.bills > 0 ? (month.revenue / month.bills).toFixed(2) : 0,
+    }))
+
+    exportToCSV(data, "monthly_revenue", [
+      "Month",
+      "Revenue",
+      "Bills",
+      "Paid",
+      "Pending",
+      "Customers",
+      "Average Bill Value",
+    ])
+  }
+
+  const exportTransactionHistory = () => {
+    const data = filteredInvoices.map((invoice) => ({
+      date: invoice.date,
+      invoiceid: invoice.id,
+      customername: invoice.customerName || "N/A",
+      customerphone: invoice.customerPhone || "N/A",
+      items: invoice.items.map((item) => `${item.name} (${item.quantity})`).join("; "),
+      subtotal: invoice.subtotal,
+      advance: invoice.advance,
+      remaining: invoice.remaining,
+      status: invoice.status,
+    }))
+
+    const periodLabel = selectedMonth
+      ? availableMonths.find((m) => m.value === selectedMonth)?.label || selectedMonth
+      : selectedPeriod
+
+    exportToCSV(data, `transaction_history_${periodLabel.replace(/\s+/g, "_")}`, [
+      "Date",
+      "Invoice ID",
+      "Customer Name",
+      "Customer Phone",
+      "Items",
+      "Subtotal",
+      "Advance",
+      "Remaining",
+      "Status",
+    ])
+  }
+
+  const exportCustomerData = () => {
+    const data = customerData.map((customer) => ({
+      customername: customer.name,
+      customerphone: customer.phone,
+      totalrevenue: customer.revenue,
+      totalbills: customer.bills,
+      averagebillvalue: (customer.revenue / customer.bills).toFixed(2),
+      lastvisit: customer.lastVisit,
+    }))
+
+    exportToCSV(data, "customer_analysis", [
+      "Customer Name",
+      "Customer Phone",
+      "Total Revenue",
+      "Total Bills",
+      "Average Bill Value",
+      "Last Visit",
+    ])
+  }
+
+  const exportServiceData = () => {
+    const data = serviceData.map((service) => ({
+      servicename: service.name,
+      totalrevenue: service.revenue,
+      totalquantity: service.quantity,
+      totalbills: service.bills,
+      averagerate: (service.revenue / service.quantity).toFixed(2),
+    }))
+
+    exportToCSV(data, "service_analysis", [
+      "Service Name",
+      "Total Revenue",
+      "Total Quantity",
+      "Total Bills",
+      "Average Rate",
+    ])
+  }
+
   return (
     <div className="space-y-6">
       {/* Controls */}
@@ -274,18 +441,40 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
           <p className="text-muted-foreground">Comprehensive insights into your photo studio performance</p>
         </div>
         <div className="flex items-center gap-4">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
+          <Select
+            value={selectedMonth}
+            onValueChange={(value) => {
+              setSelectedMonth(value)
+              if (value !== "all") setSelectedPeriod("")
+            }}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Select specific month" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1month">Last Month</SelectItem>
-              <SelectItem value="3months">Last 3 Months</SelectItem>
-              <SelectItem value="6months">Last 6 Months</SelectItem>
-              <SelectItem value="1year">Last Year</SelectItem>
-              <SelectItem value="year">Specific Year</SelectItem>
+              <SelectItem value="all">All periods</SelectItem>
+              {availableMonths.map((month) => (
+                <SelectItem key={month.value} value={month.value}>
+                  {month.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+
+          {selectedMonth === "all" && (
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1month">Last Month</SelectItem>
+                <SelectItem value="3months">Last 3 Months</SelectItem>
+                <SelectItem value="6months">Last 6 Months</SelectItem>
+                <SelectItem value="1year">Last Year</SelectItem>
+                <SelectItem value="year">Specific Year</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
 
           {selectedPeriod === "year" && (
             <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -301,6 +490,27 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
               </SelectContent>
             </Select>
           )}
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportMonthlyRevenue}
+              className="flex items-center gap-2 bg-transparent"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              Export Monthly
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportTransactionHistory}
+              className="flex items-center gap-2 bg-transparent"
+            >
+              <Download className="w-4 h-4" />
+              Export Transactions
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -391,11 +601,53 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
 
         <TabsContent value="revenue" className="space-y-4">
           <Card className="glass-effect">
-            <CardHeader>
-              <CardTitle>Monthly Revenue Trends</CardTitle>
-              <CardDescription>Revenue, paid amounts, and pending payments over time</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Monthly Revenue Trends</CardTitle>
+                <CardDescription>Revenue, paid amounts, and pending payments over time</CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportMonthlyRevenue}
+                className="flex items-center gap-2 bg-transparent"
+              >
+                <Download className="w-4 h-4" />
+                Export Data
+              </Button>
             </CardHeader>
             <CardContent>
+              {selectedMonth !== "all" && monthlyData.length > 0 && (
+                <div className="mb-6 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="font-semibold mb-2">
+                    Detailed Breakdown for {availableMonths.find((m) => m.value === selectedMonth)?.label}
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <div className="text-muted-foreground">Total Revenue</div>
+                      <div className="font-bold">NPR {monthlyData[0]?.revenue.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Total Bills</div>
+                      <div className="font-bold">{monthlyData[0]?.bills}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Unique Customers</div>
+                      <div className="font-bold">{monthlyData[0]?.customers}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Avg Bill Value</div>
+                      <div className="font-bold">
+                        NPR{" "}
+                        {monthlyData[0]?.bills > 0
+                          ? (monthlyData[0].revenue / monthlyData[0].bills).toLocaleString()
+                          : 0}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <ChartContainer config={chartConfig} className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={monthlyData}>
@@ -434,9 +686,20 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
 
         <TabsContent value="services" className="space-y-4">
           <Card className="glass-effect">
-            <CardHeader>
-              <CardTitle>Top Services by Revenue</CardTitle>
-              <CardDescription>Most profitable services and products</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Top Services by Revenue</CardTitle>
+                <CardDescription>Most profitable services and products</CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportServiceData}
+                className="flex items-center gap-2 bg-transparent"
+              >
+                <Download className="w-4 h-4" />
+                Export Data
+              </Button>
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig} className="h-[400px]">
@@ -456,9 +719,20 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
 
         <TabsContent value="customers" className="space-y-4">
           <Card className="glass-effect">
-            <CardHeader>
-              <CardTitle>Top Customers by Revenue</CardTitle>
-              <CardDescription>Your most valuable customers</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Top Customers by Revenue</CardTitle>
+                <CardDescription>Your most valuable customers</CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportCustomerData}
+                className="flex items-center gap-2 bg-transparent"
+              >
+                <Download className="w-4 h-4" />
+                Export Data
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -542,9 +816,23 @@ export function AnalyticsDashboard({ invoices }: AnalyticsDashboardProps) {
 
       {/* Transaction History Table */}
       <Card className="glass-effect">
-        <CardHeader>
-          <CardTitle>Detailed Transaction History</CardTitle>
-          <CardDescription>Complete record of all transactions in the selected period</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Detailed Transaction History</CardTitle>
+            <CardDescription>
+              Complete record of all transactions in the selected period
+              {selectedMonth !== "all" && ` for ${availableMonths.find((m) => m.value === selectedMonth)?.label}`}
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportTransactionHistory}
+            className="flex items-center gap-2 bg-transparent"
+          >
+            <Download className="w-4 h-4" />
+            Export Transactions
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
