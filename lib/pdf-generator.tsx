@@ -212,6 +212,24 @@ export function generateInvoicePDF(invoice: any) {
           color: #555;
         }
         
+        .payment-qr {
+          margin-top: 15px;
+          text-align: center;
+        }
+
+        .qr-image {
+          width: 120px;
+          height: auto;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
+
+        .qr-label {
+          font-size: 11px;
+          color: #666;
+          margin-top: 5px;
+        }
+        
         .totals-section {
           width: 300px;
           background: #f8f9fa;
@@ -502,9 +520,13 @@ export function generateInvoicePDF(invoice: any) {
         <div class="payment-info">
           <h3>Payment Info:</h3>
           <div class="payment-details">
-            Account #: Available on request<br>
+            Esewa: 9869317165<br>
             A/C Name: Pixel Production<br>
             Bank Details: Contact for bank details
+            <div class="payment-qr">
+              <img src="/images/fonepay-qr.jpg" alt="FonePay QR Code" class="qr-image">
+              <div class="qr-label">Scan to Pay</div>
+            </div>
           </div>
         </div>
         
@@ -557,11 +579,15 @@ export function generateInvoicePDF(invoice: any) {
         </div>
         <div class="contact-item">
           <span class="contact-icon">✉</span>
-          <span>info@pixelproduction.com</span>
+          <span>cellsansarphotostudio@gmail.com</span>
         </div>
         <div class="contact-item">
-          <span class="contact-icon">🌐</span>
-          <span>www.pixelproduction.com</span>
+          <span class="contact-icon">📱</span>
+          <span>WhatsApp: 9869317165</span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">📞</span>
+          <span>Viber: 9869317165</span>
         </div>
       </div>
 
