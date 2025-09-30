@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Plus, Trash2, FileText, Download } from "lucide-react"
+import { Plus, Trash2, FileText, Download, MessageCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
+import { sendWhatsAppMessage } from "@/lib/whatsapp-sender"
 
 interface DetailedBillFormProps {
   onSubmit: (invoice: any) => void
@@ -43,6 +44,7 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
   const [isLabPhoto, setIsLabPhoto] = useState(false)
   const [addToOrders, setAddToOrders] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [lastCreatedInvoice, setLastCreatedInvoice] = useState<any>(null)
   const { toast } = useToast()
 
   const subtotal = items.reduce((sum, item) => sum + item.total, 0)
@@ -104,6 +106,7 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
     setIsSubmitting(true)
 
     const invoice = {
+      id: `INV-${Date.now()}`,
       type: "detailed" as const,
       customerPhone: customerPhone || undefined,
       customerName: customerName || undefined,
@@ -111,6 +114,7 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       subtotal: finalTotal,
       advance: advanceAmount,
       remaining: remaining,
+      date: new Date().toISOString().split("T")[0],
       status: remaining <= 0 ? ("paid" as const) : ("pending" as const),
       discount: discountAmount,
       orderInfo: createOrderInfo
@@ -172,6 +176,8 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
 
     onSubmit(invoice)
 
+    setLastCreatedInvoice(invoice)
+
     let successMessage = "Detailed bill created successfully"
     if (isLabPhoto && addToOrders) {
       successMessage += " and added to lab management and pending orders"
@@ -186,15 +192,6 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       description: successMessage,
     })
 
-    setCustomerPhone("")
-    setCustomerName("")
-    setItems([{ name: "", quantity: 1, rate: 0, total: 0 }])
-    setAdvance("")
-    setDiscount("")
-    setCreateOrderInfo(false)
-    setPhotoNumber("")
-    setIsLabPhoto(false)
-    setAddToOrders(false)
     setIsSubmitting(false)
   }
 
@@ -225,6 +222,39 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
     }
 
     generateInvoicePDF(invoice)
+  }
+
+  const handleSendWhatsApp = () => {
+    if (!lastCreatedInvoice) return
+
+    if (!customerPhone) {
+      toast({
+        title: "Error",
+        description: "Please enter customer phone number to send via WhatsApp",
+        variant: "destructive",
+      })
+      return
+    }
+
+    sendWhatsAppMessage(customerPhone, lastCreatedInvoice)
+
+    toast({
+      title: "Opening WhatsApp",
+      description: "WhatsApp will open with the bill message",
+    })
+
+    setTimeout(() => {
+      setCustomerPhone("")
+      setCustomerName("")
+      setItems([{ name: "", quantity: 1, rate: 0, total: 0 }])
+      setAdvance("")
+      setDiscount("")
+      setCreateOrderInfo(false)
+      setPhotoNumber("")
+      setIsLabPhoto(false)
+      setAddToOrders(false)
+      setLastCreatedInvoice(null)
+    }, 1000)
   }
 
   return (
@@ -480,6 +510,18 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
           <Button type="button" variant="outline" onClick={handleDownloadPDF}>
             <Download className="w-4 h-4 mr-2" />
             Preview PDF
+          </Button>
+        )}
+
+        {lastCreatedInvoice && customerPhone && (
+          <Button
+            type="button"
+            variant="default"
+            onClick={handleSendWhatsApp}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <MessageCircle className="w-4 h-4 mr-2" />
+            Send via WhatsApp
           </Button>
         )}
       </div>

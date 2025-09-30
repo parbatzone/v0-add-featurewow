@@ -9,9 +9,10 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Zap, Download } from "lucide-react"
+import { Zap, Download, MessageCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
+import { sendWhatsAppMessage } from "@/lib/whatsapp-sender"
 
 interface QuickBillFormProps {
   onSubmit: (invoice: any) => void
@@ -24,6 +25,7 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
   const [createOrderInfo, setCreateOrderInfo] = useState(false)
   const [photoNumber, setPhotoNumber] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [lastCreatedInvoice, setLastCreatedInvoice] = useState<any>(null)
   const { toast } = useToast()
 
   const remaining = price && advance ? Number.parseFloat(price) - Number.parseFloat(advance || "0") : 0
@@ -51,6 +53,7 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
     setIsSubmitting(true)
 
     const invoice = {
+      id: `INV-${Date.now()}`,
       type: "quick" as const,
       customerPhone: customerPhone || undefined,
       items: [
@@ -64,6 +67,7 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
       subtotal: Number.parseFloat(price),
       advance: Number.parseFloat(advance || "0"),
       remaining: remaining,
+      date: new Date().toISOString().split("T")[0],
       status: remaining <= 0 ? ("paid" as const) : ("pending" as const),
       orderInfo: createOrderInfo
         ? {
@@ -76,17 +80,13 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
 
     onSubmit(invoice)
 
+    setLastCreatedInvoice(invoice)
+
     toast({
       title: "Success!",
       description: "Quick bill created successfully",
     })
 
-    // Reset form
-    setPrice("")
-    setAdvance("")
-    setCustomerPhone("")
-    setCreateOrderInfo(false)
-    setPhotoNumber("")
     setIsSubmitting(false)
   }
 
@@ -120,6 +120,35 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
     }
 
     generateInvoicePDF(invoice)
+  }
+
+  const handleSendWhatsApp = () => {
+    if (!lastCreatedInvoice) return
+
+    if (!customerPhone) {
+      toast({
+        title: "Error",
+        description: "Please enter customer phone number to send via WhatsApp",
+        variant: "destructive",
+      })
+      return
+    }
+
+    sendWhatsAppMessage(customerPhone, lastCreatedInvoice)
+
+    toast({
+      title: "Opening WhatsApp",
+      description: "WhatsApp will open with the bill message",
+    })
+
+    setTimeout(() => {
+      setPrice("")
+      setAdvance("")
+      setCustomerPhone("")
+      setCreateOrderInfo(false)
+      setPhotoNumber("")
+      setLastCreatedInvoice(null)
+    }, 1000)
   }
 
   return (
@@ -224,6 +253,18 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
           <Button type="button" variant="outline" onClick={handleDownloadPDF}>
             <Download className="w-4 h-4 mr-2" />
             Preview PDF
+          </Button>
+        )}
+
+        {lastCreatedInvoice && customerPhone && (
+          <Button
+            type="button"
+            variant="default"
+            onClick={handleSendWhatsApp}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <MessageCircle className="w-4 h-4 mr-2" />
+            Send via WhatsApp
           </Button>
         )}
       </div>
