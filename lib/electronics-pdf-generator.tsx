@@ -152,8 +152,30 @@ export function generateElectronicsInvoicePDF(invoice: any) {
         
         .payment-section {
           display: flex;
-          justify-content: flex-end;
+          justify-content: space-between;
+          align-items: flex-start;
           margin-bottom: 25px;
+          gap: 20px;
+        }
+        
+        .qr-section {
+          flex-shrink: 0;
+          text-align: center;
+        }
+        
+        .qr-code {
+          width: 140px;
+          height: auto;
+          border: 2px solid #dee2e6;
+          padding: 8px;
+          background: white;
+        }
+        
+        .qr-label {
+          font-size: 10px;
+          color: #666;
+          margin-top: 6px;
+          font-weight: 500;
         }
         
         .totals-section {
@@ -313,6 +335,8 @@ export function generateElectronicsInvoicePDF(invoice: any) {
             Amarshing Chowk<br>
             Kageshwori Manohara - 07<br>
             Kathmandu, Nepal<br>
+            Phone: 9860173537<br>
+            Phone: 9761132260<br>
             Phone: 9869317165
           </div>
         </div>
@@ -373,6 +397,11 @@ export function generateElectronicsInvoicePDF(invoice: any) {
       </table>
 
       <div class="payment-section">
+        <div class="qr-section">
+          <img src="/images/payment-qr.jpg" alt="Payment QR Code" class="qr-code" />
+          <div class="qr-label">Scan to Pay</div>
+        </div>
+        
         <div class="totals-section">
           <div class="total-row">
             <span class="total-label">Sub Total</span>
@@ -413,19 +442,19 @@ export function generateElectronicsInvoicePDF(invoice: any) {
       <div class="footer-contact">
         <div class="contact-item">
           <span class="contact-icon">📞</span>
+          <span>9860173537</span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">📞</span>
+          <span>9761132260</span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">📞</span>
           <span>9869317165</span>
         </div>
         <div class="contact-item">
           <span class="contact-icon">📍</span>
           <span>Amarshing Chowk, Kageshwori Manohara - 07, Kathmandu</span>
-        </div>
-        <div class="contact-item">
-          <span class="contact-icon">📱</span>
-          <span>WhatsApp: 9869317165</span>
-        </div>
-        <div class="contact-item">
-          <span class="contact-icon">📞</span>
-          <span>Viber: 9869317165</span>
         </div>
       </div>
     </body>
