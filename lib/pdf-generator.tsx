@@ -59,8 +59,8 @@ export function generateInvoicePDF(invoice: any) {
           font-family: 'Arial', sans-serif;
           max-width: 800px;
           margin: 0 auto;
-          padding: 30px;
-          line-height: 1.5;
+          padding: 20px;
+          line-height: 1.4;
           color: #333;
           background: white;
         }
@@ -69,8 +69,8 @@ export function generateInvoicePDF(invoice: any) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 40px;
-          padding-bottom: 20px;
+          margin-bottom: 30px;
+          padding-bottom: 15px;
           border-bottom: 3px solid #2563eb;
         }
         
@@ -113,22 +113,22 @@ export function generateInvoicePDF(invoice: any) {
         .invoice-details {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          gap: 30px;
-          margin-bottom: 40px;
+          gap: 20px;
+          margin-bottom: 25px;
         }
         
         .detail-section h3 {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: bold;
           color: #333;
-          margin-bottom: 10px;
+          margin-bottom: 8px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
         
         .detail-content {
-          font-size: 13px;
-          line-height: 1.6;
+          font-size: 12px;
+          line-height: 1.5;
           color: #555;
         }
         
@@ -139,14 +139,14 @@ export function generateInvoicePDF(invoice: any) {
         .meta-row {
           display: flex;
           justify-content: space-between;
-          margin-bottom: 8px;
-          font-size: 13px;
+          margin-bottom: 6px;
+          font-size: 12px;
         }
         
         .meta-label {
           font-weight: bold;
           color: #333;
-          min-width: 100px;
+          min-width: 90px;
         }
         
         .meta-value {
@@ -156,7 +156,7 @@ export function generateInvoicePDF(invoice: any) {
         .items-table {
           width: 100%;
           border-collapse: collapse;
-          margin-bottom: 30px;
+          margin-bottom: 25px;
           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
@@ -166,18 +166,18 @@ export function generateInvoicePDF(invoice: any) {
         }
         
         .items-table th {
-          padding: 15px 12px;
+          padding: 12px 10px;
           text-align: left;
           font-weight: bold;
-          font-size: 13px;
+          font-size: 12px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
         
         .items-table td {
-          padding: 15px 12px;
+          padding: 12px 10px;
           border-bottom: 1px solid #eee;
-          font-size: 13px;
+          font-size: 12px;
         }
         
         .items-table tbody tr:hover {
@@ -190,16 +190,16 @@ export function generateInvoicePDF(invoice: any) {
         .payment-section {
           display: flex;
           justify-content: space-between;
-          margin-bottom: 40px;
+          margin-bottom: 30px;
+          gap: 30px;
         }
         
         .payment-info {
           flex: 1;
-          margin-right: 40px;
         }
         
         .payment-info h3 {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: bold;
           color: #333;
           margin-bottom: 10px;
@@ -217,21 +217,25 @@ export function generateInvoicePDF(invoice: any) {
           text-align: center;
         }
 
+        /* Made QR code larger for easy mobile scanning */
         .qr-image {
-          width: 120px;
+          width: 180px;
           height: auto;
-          border: 1px solid #ddd;
+          border: 2px solid #333;
           border-radius: 4px;
+          padding: 5px;
+          background: white;
         }
 
         .qr-label {
           font-size: 11px;
           color: #666;
-          margin-top: 5px;
+          margin-top: 8px;
+          font-weight: bold;
         }
         
         .totals-section {
-          width: 300px;
+          width: 280px;
           background: #f8f9fa;
           border: 1px solid #dee2e6;
         }
@@ -239,8 +243,8 @@ export function generateInvoicePDF(invoice: any) {
         .total-row {
           display: flex;
           justify-content: space-between;
-          padding: 12px 20px;
-          font-size: 14px;
+          padding: 10px 15px;
+          font-size: 13px;
           border-bottom: 1px solid #dee2e6;
         }
         
@@ -265,22 +269,22 @@ export function generateInvoicePDF(invoice: any) {
         .final-total {
           background: #2563eb;
           color: white;
-          font-size: 18px;
+          font-size: 16px;
           font-weight: bold;
-          padding: 20px;
+          padding: 15px;
         }
         
         .signature-section {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          margin-top: 60px;
-          padding-top: 30px;
+          margin-top: 40px;
+          padding-top: 20px;
           border-top: 1px solid #dee2e6;
         }
         
         .thanks-message {
-          font-size: 14px;
+          font-size: 13px;
           color: #666;
           font-style: italic;
         }
@@ -306,12 +310,12 @@ export function generateInvoicePDF(invoice: any) {
         
         .signature-name {
           font-weight: bold;
-          font-size: 14px;
+          font-size: 13px;
           color: #333;
         }
         
         .signature-title {
-          font-size: 12px;
+          font-size: 11px;
           color: #666;
           margin-top: 2px;
         }
@@ -319,12 +323,13 @@ export function generateInvoicePDF(invoice: any) {
         .footer-contact {
           display: flex;
           justify-content: center;
-          gap: 40px;
-          margin-top: 40px;
-          padding-top: 20px;
+          gap: 30px;
+          margin-top: 30px;
+          padding-top: 15px;
           border-top: 3px solid #2563eb;
-          font-size: 12px;
+          font-size: 11px;
           color: #666;
+          flex-wrap: wrap;
         }
         
         .contact-item {
@@ -339,7 +344,7 @@ export function generateInvoicePDF(invoice: any) {
         }
         
         .order-info-section {
-          margin-top: 40px;
+          margin-top: 30px;
           page-break-inside: avoid;
           display: flex;
           justify-content: center;
@@ -396,7 +401,7 @@ export function generateInvoicePDF(invoice: any) {
         @media print {
           body { 
             margin: 0;
-            padding: 20px;
+            padding: 15px;
           }
           
           @page {
@@ -521,10 +526,9 @@ export function generateInvoicePDF(invoice: any) {
           <h3>Payment Info:</h3>
           <div class="payment-details">
             Esewa: 9869317165<br>
-            A/C Name: Pixel Production<br>
-            Bank Details: Contact for bank details
+            Khalti: 9869317165
             <div class="payment-qr">
-              <img src="/images/fonepay-qr.jpg" alt="FonePay QR Code" class="qr-image">
+              <img src="/images/payment-qr.jpg" alt="Payment QR Code" class="qr-image">
               <div class="qr-label">Scan to Pay</div>
             </div>
           </div>
