@@ -1,46 +1,10 @@
-export function generateInvoicePDF(invoice: any) {
+export function generateElectronicsInvoicePDF(invoice: any) {
   const printWindow = window.open("", "_blank")
 
   if (!printWindow) {
     alert("Please allow popups to download the PDF")
     return
   }
-
-  const orderInfoHTML = invoice.orderInfo
-    ? `
-    <div class="order-info-section">
-      <div class="order-info-label">
-        <div class="label-header">
-          <img src="/images/pixel-production-stamp.png" alt="Pixel Production" class="label-logo">
-          <div class="label-title">PIXEL PRODUCTION</div>
-          <div class="label-phone">9869317165</div>
-        </div>
-        <div class="label-content">
-          <div class="label-row">
-            <span>Invoice:</span>
-            <span>${invoice.id}</span>
-          </div>
-          <div class="label-row">
-            <span>Photo:</span>
-            <span>${invoice.orderInfo.photoNumber}</span>
-          </div>
-          <div class="label-row">
-            <span>Total:</span>
-            <span>NPR ${invoice.orderInfo.totalAmount.toLocaleString()}</span>
-          </div>
-          <div class="label-row">
-            <span>Advance:</span>
-            <span>NPR ${invoice.orderInfo.advance.toLocaleString()}</span>
-          </div>
-          <div class="label-row remaining">
-            <span>Balance:</span>
-            <span>NPR ${(invoice.orderInfo.totalAmount - invoice.orderInfo.advance).toLocaleString()}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
-    : ""
 
   const invoiceHTML = `
     <!DOCTYPE html>
@@ -82,14 +46,6 @@ export function generateInvoicePDF(invoice: any) {
           display: flex;
           align-items: center;
           gap: 12px;
-        }
-        
-        .brand-logo {
-          width: 55px;
-          height: 55px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid #2563eb;
         }
         
         .brand-info h1 {
@@ -159,7 +115,6 @@ export function generateInvoicePDF(invoice: any) {
           text-align: right;
         }
         
-        /* Added table borders and fixed alignment */
         .items-table {
           width: 100%;
           border-collapse: collapse;
@@ -197,48 +152,8 @@ export function generateInvoicePDF(invoice: any) {
         
         .payment-section {
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-end;
           margin-bottom: 25px;
-          gap: 25px;
-        }
-        
-        .payment-info {
-          flex: 1;
-        }
-        
-        .payment-info h3 {
-          font-size: 12px;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 8px;
-          text-transform: uppercase;
-        }
-        
-        .payment-details {
-          font-size: 11px;
-          line-height: 1.6;
-          color: #555;
-        }
-        
-        .payment-qr {
-          margin-top: 12px;
-          text-align: center;
-        }
-
-        .qr-image {
-          width: 160px;
-          height: auto;
-          border: 2px solid #333;
-          border-radius: 4px;
-          padding: 4px;
-          background: white;
-        }
-
-        .qr-label {
-          font-size: 10px;
-          color: #666;
-          margin-top: 6px;
-          font-weight: bold;
         }
         
         .totals-section {
@@ -302,18 +217,9 @@ export function generateInvoicePDF(invoice: any) {
           width: 180px;
         }
         
-        .signature-image {
-          width: 140px;
-          height: 55px;
-          object-fit: contain;
-          margin-bottom: 8px;
-          filter: contrast(1.5) brightness(0.7);
-          mix-blend-mode: multiply;
-        }
-        
         .signature-line {
           border-top: 2px solid #333;
-          margin: 8px 0 4px 0;
+          margin: 40px 0 4px 0;
         }
         
         .signature-name {
@@ -351,61 +257,6 @@ export function generateInvoicePDF(invoice: any) {
           color: #2563eb;
         }
         
-        .order-info-section {
-          margin-top: 25px;
-          page-break-inside: avoid;
-          display: flex;
-          justify-content: center;
-        }
-        
-        .order-info-label {
-          width: 260px;
-          height: 170px;
-          border: 2px solid #000;
-          padding: 12px;
-          font-size: 11px;
-          background: white;
-          box-sizing: border-box;
-        }
-        
-        .label-header {
-          text-align: center;
-          margin-bottom: 10px;
-          border-bottom: 1px solid #000;
-          padding-bottom: 6px;
-        }
-        
-        .label-logo {
-          width: 22px;
-          height: 22px;
-          object-fit: contain;
-          margin-bottom: 4px;
-        }
-        
-        .label-title {
-          font-weight: bold;
-          font-size: 11px;
-          margin-bottom: 2px;
-        }
-        
-        .label-phone {
-          font-size: 9px;
-        }
-        
-        .label-row {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 4px;
-          font-size: 10px;
-        }
-        
-        .label-row.remaining {
-          font-weight: bold;
-          border-top: 1px solid #000;
-          padding-top: 4px;
-          margin-top: 6px;
-        }
-        
         @media print {
           body { 
             margin: 0;
@@ -414,10 +265,6 @@ export function generateInvoicePDF(invoice: any) {
           
           .invoice-header {
             border-bottom: 3px solid #000;
-          }
-          
-          .brand-logo {
-            border-color: #000;
           }
           
           .brand-info h1 {
@@ -442,10 +289,9 @@ export function generateInvoicePDF(invoice: any) {
     <body>
       <div class="invoice-header">
         <div class="brand-section">
-          <img src="/images/pixel-production-stamp.png" alt="Pixel Production" class="brand-logo">
           <div class="brand-info">
-            <h1>Pixel Production</h1>
-            <div class="brand-tagline">Professional Photography</div>
+            <h1>Pratima Electronics</h1>
+            <div class="brand-tagline">Quality Electronics & Appliances</div>
           </div>
         </div>
         <div class="invoice-title">INVOICE</div>
@@ -463,7 +309,9 @@ export function generateInvoicePDF(invoice: any) {
         <div class="detail-section">
           <h3>From:</h3>
           <div class="detail-content">
-            Pixel Production<br>
+            Pratima Electronics<br>
+            Amarshing Chowk<br>
+            Kageshwori Manohara - 07<br>
             Kathmandu, Nepal<br>
             Phone: 9869317165
           </div>
@@ -488,11 +336,11 @@ export function generateInvoicePDF(invoice: any) {
       <table class="items-table">
         <thead>
           <tr>
-            <th style="width: 8%">No</th>
-            <th style="width: 50%">Item Description</th>
+            <th style="width: 6%">No</th>
+            <th style="width: 54%">Item Description</th>
             <th style="width: 12%" class="text-center">Qty</th>
-            <th style="width: 15%" class="text-right">Price</th>
-            <th style="width: 15%" class="text-right">Total</th>
+            <th style="width: 14%" class="text-right">Price</th>
+            <th style="width: 14%" class="text-right">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -514,7 +362,7 @@ export function generateInvoicePDF(invoice: any) {
               : `
                 <tr>
                   <td class="text-center">1</td>
-                  <td>Professional Photography Service</td>
+                  <td>Electronics Product</td>
                   <td class="text-center">1</td>
                   <td class="text-right">NPR ${invoice.subtotal.toLocaleString()}</td>
                   <td class="text-right">NPR ${invoice.subtotal.toLocaleString()}</td>
@@ -525,18 +373,6 @@ export function generateInvoicePDF(invoice: any) {
       </table>
 
       <div class="payment-section">
-        <div class="payment-info">
-          <h3>Payment Info:</h3>
-          <div class="payment-details">
-            Esewa: 9869317165<br>
-            Khalti: 9869317165
-            <div class="payment-qr">
-              <img src="/images/payment-qr.jpg" alt="Payment QR Code" class="qr-image">
-              <div class="qr-label">Scan to Pay</div>
-            </div>
-          </div>
-        </div>
-        
         <div class="totals-section">
           <div class="total-row">
             <span class="total-label">Sub Total</span>
@@ -568,10 +404,9 @@ export function generateInvoicePDF(invoice: any) {
           Thanks for your business.
         </div>
         <div class="signature-box">
-          <img src="/images/parbat-signature.png" alt="Signature" class="signature-image">
           <div class="signature-line"></div>
-          <div class="signature-name">Parbat Chaulagain</div>
-          <div class="signature-title">Authorized Sign</div>
+          <div class="signature-name">Authorized Signature</div>
+          <div class="signature-title">Pratima Electronics</div>
         </div>
       </div>
 
@@ -582,11 +417,7 @@ export function generateInvoicePDF(invoice: any) {
         </div>
         <div class="contact-item">
           <span class="contact-icon">📍</span>
-          <span>Kathmandu, Nepal</span>
-        </div>
-        <div class="contact-item">
-          <span class="contact-icon">✉</span>
-          <span>cellsansarphotostudio@gmail.com</span>
+          <span>Amarshing Chowk, Kageshwori Manohara - 07, Kathmandu</span>
         </div>
         <div class="contact-item">
           <span class="contact-icon">📱</span>
@@ -597,8 +428,6 @@ export function generateInvoicePDF(invoice: any) {
           <span>Viber: 9869317165</span>
         </div>
       </div>
-
-      ${orderInfoHTML}
     </body>
     </html>
   `
