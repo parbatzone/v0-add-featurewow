@@ -164,7 +164,7 @@ export function generateElectronicsInvoicePDF(invoice: any) {
         }
         
         .qr-code {
-          width: 140px;
+          width: 170px; /* Increased QR code size from 140px to 170px for easier mobile scanning */
           height: auto;
           border: 2px solid #dee2e6;
           padding: 8px;
