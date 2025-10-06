@@ -12,6 +12,8 @@ interface DashboardStatsProps {
     remaining: number
     date: string
     status: "paid" | "pending"
+    customerPhone: string
+    customerName: string
   }>
   customers: Array<{
     phone: string
@@ -35,6 +37,25 @@ export function DashboardStats({ invoices, customers }: DashboardStatsProps) {
   const totalCustomers = customers.length
 
   const recentInvoices = invoices.slice(0, 5)
+
+  const topCustomers = customers
+    .map((customer) => {
+      // Calculate totals from current invoices only
+      const customerInvoices = invoices.filter(
+        (inv) => inv.customerPhone === customer.phone || inv.customerName === customer.name,
+      )
+      const totalAmount = customerInvoices.reduce((sum, inv) => sum + inv.subtotal, 0)
+      const totalBills = customerInvoices.length
+
+      return {
+        ...customer,
+        totalAmount,
+        totalBills,
+      }
+    })
+    .filter((customer) => customer.totalBills > 0) // Only show customers with current invoices
+    .sort((a, b) => b.totalAmount - a.totalAmount)
+    .slice(0, 5)
 
   return (
     <div className="space-y-6">
@@ -131,22 +152,19 @@ export function DashboardStats({ invoices, customers }: DashboardStatsProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {customers
-                .sort((a, b) => b.totalAmount - a.totalAmount)
-                .slice(0, 5)
-                .map((customer) => (
-                  <div key={customer.phone} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <div className="font-medium">{customer.name}</div>
-                      <div className="text-sm text-muted-foreground">{customer.phone}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold">NPR {customer.totalAmount.toLocaleString()}</div>
-                      <div className="text-xs text-muted-foreground">{customer.totalBills} bills</div>
-                    </div>
+              {topCustomers.map((customer) => (
+                <div key={customer.phone} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <div className="font-medium">{customer.name}</div>
+                    <div className="text-sm text-muted-foreground">{customer.phone}</div>
                   </div>
-                ))}
-              {customers.length === 0 && <p className="text-muted-foreground text-center py-4">No customers yet</p>}
+                  <div className="text-right">
+                    <div className="font-semibold">NPR {customer.totalAmount.toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground">{customer.totalBills} bills</div>
+                  </div>
+                </div>
+              ))}
+              {topCustomers.length === 0 && <p className="text-muted-foreground text-center py-4">No customers yet</p>}
             </div>
           </CardContent>
         </Card>

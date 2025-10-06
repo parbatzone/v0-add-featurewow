@@ -243,18 +243,16 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       description: "WhatsApp will open with the bill message",
     })
 
-    setTimeout(() => {
-      setCustomerPhone("")
-      setCustomerName("")
-      setItems([{ name: "", quantity: 1, rate: 0, total: 0 }])
-      setAdvance("")
-      setDiscount("")
-      setCreateOrderInfo(false)
-      setPhotoNumber("")
-      setIsLabPhoto(false)
-      setAddToOrders(false)
-      setLastCreatedInvoice(null)
-    }, 1000)
+    setCustomerPhone("")
+    setCustomerName("")
+    setItems([{ name: "", quantity: 1, rate: 0, total: 0 }])
+    setAdvance("")
+    setDiscount("")
+    setCreateOrderInfo(false)
+    setPhotoNumber("")
+    setIsLabPhoto(false)
+    setAddToOrders(false)
+    setLastCreatedInvoice(null)
   }
 
   return (

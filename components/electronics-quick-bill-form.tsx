@@ -52,6 +52,13 @@ export function ElectronicsQuickBillForm({ onSubmit }: QuickBillFormProps) {
     setStatus("pending")
   }
 
+  const handleSendWhatsApp = () => {
+    if (!lastInvoice) return
+    sendElectronicsWhatsAppMessage(lastInvoice)
+    // Clear the last invoice after sending to prevent duplicate sends
+    setTimeout(() => setLastInvoice(null), 2000)
+  }
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -118,11 +125,7 @@ export function ElectronicsQuickBillForm({ onSubmit }: QuickBillFormProps) {
             Download PDF
           </Button>
           {lastInvoice.customerPhone && (
-            <Button
-              onClick={() => sendElectronicsWhatsAppMessage(lastInvoice)}
-              variant="default"
-              className="flex-1 bg-green-600 hover:bg-green-700"
-            >
+            <Button onClick={handleSendWhatsApp} variant="default" className="flex-1 bg-green-600 hover:bg-green-700">
               <Send className="w-4 h-4 mr-2" />
               Send via WhatsApp
             </Button>

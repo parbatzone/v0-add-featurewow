@@ -141,14 +141,12 @@ export function QuickBillForm({ onSubmit }: QuickBillFormProps) {
       description: "WhatsApp will open with the bill message",
     })
 
-    setTimeout(() => {
-      setPrice("")
-      setAdvance("")
-      setCustomerPhone("")
-      setCreateOrderInfo(false)
-      setPhotoNumber("")
-      setLastCreatedInvoice(null)
-    }, 1000)
+    setPrice("")
+    setAdvance("")
+    setCustomerPhone("")
+    setCreateOrderInfo(false)
+    setPhotoNumber("")
+    setLastCreatedInvoice(null)
   }
 
   return (
