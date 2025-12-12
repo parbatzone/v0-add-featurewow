@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { generateElectronicsInvoicePDF } from "@/lib/electronics-pdf-generator"
-import { Search, Download, Trash2 } from "lucide-react"
+import { Search, Download, Trash2, Bell } from "lucide-react"
+import { sendElectronicsPickupReadyMessage } from "@/lib/electronics-whatsapp-sender"
+import { useToast } from "@/hooks/use-toast"
 
 interface Invoice {
   id: string
@@ -33,6 +35,7 @@ interface InvoiceHistoryProps {
 
 export function ElectronicsInvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
   const [searchTerm, setSearchTerm] = useState("")
+  const { toast } = useToast()
 
   const filteredInvoices = invoices.filter(
     (inv) =>
@@ -45,6 +48,23 @@ export function ElectronicsInvoiceHistory({ invoices, setInvoices }: InvoiceHist
     if (confirm("Are you sure you want to delete this invoice?")) {
       setInvoices(invoices.filter((inv) => inv.id !== id))
     }
+  }
+
+  const notifyCustomer = (invoice: Invoice) => {
+    if (!invoice.customerPhone) {
+      toast({
+        title: "No Phone Number",
+        description: "This invoice doesn't have a customer phone number.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    sendElectronicsPickupReadyMessage(invoice)
+    toast({
+      title: "Notification Sent",
+      description: "Customer notified via WhatsApp that order is ready for pickup.",
+    })
   }
 
   return (
@@ -89,6 +109,15 @@ export function ElectronicsInvoiceHistory({ invoices, setInvoices }: InvoiceHist
                     <p className="text-xs text-muted-foreground">{invoice.date}</p>
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      onClick={() => notifyCustomer(invoice)}
+                      size="sm"
+                      variant="outline"
+                      className="bg-green-500/10 hover:bg-green-500/20 text-green-600 border-green-500/30"
+                      disabled={!invoice.customerPhone}
+                    >
+                      <Bell className="w-4 h-4" />
+                    </Button>
                     <Button onClick={() => generateElectronicsInvoicePDF(invoice)} size="sm" variant="outline">
                       <Download className="w-4 h-4" />
                     </Button>

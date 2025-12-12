@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Download, Trash2 } from "lucide-react"
+import { Search, Download, Trash2, Bell } from "lucide-react"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
+import { sendPickupReadyMessage } from "@/lib/whatsapp-sender"
+import { useToast } from "@/hooks/use-toast"
 
 interface InvoiceHistoryProps {
   invoices: Array<{
@@ -35,6 +37,7 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [dateFilter, setDateFilter] = useState<string>("all")
+  const { toast } = useToast()
 
   const filteredInvoices = invoices.filter((invoice) => {
     const matchesSearch =
@@ -73,6 +76,23 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
     if (confirm("Are you sure you want to delete this invoice? This action cannot be undone.")) {
       setInvoices(invoices.filter((inv) => inv.id !== invoiceId))
     }
+  }
+
+  const notifyCustomer = (invoice: any) => {
+    if (!invoice.customerPhone) {
+      toast({
+        title: "No Phone Number",
+        description: "This invoice doesn't have a customer phone number.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    sendPickupReadyMessage(invoice.customerPhone, invoice)
+    toast({
+      title: "Notification Sent",
+      description: "Customer notified via WhatsApp that order is ready for pickup.",
+    })
   }
 
   const totalAmount = filteredInvoices.reduce((sum, inv) => sum + inv.subtotal, 0)
@@ -183,6 +203,16 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
                   </div>
 
                   <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-green-500/10 hover:bg-green-500/20 text-green-600 border-green-500/30"
+                      onClick={() => notifyCustomer(invoice)}
+                      disabled={!invoice.customerPhone}
+                    >
+                      <Bell className="w-4 h-4 mr-1" />
+                      Arrived
+                    </Button>
                     <Button size="sm" variant="outline" onClick={() => generateInvoicePDF(invoice)}>
                       <Download className="w-4 h-4 mr-1" />
                       PDF

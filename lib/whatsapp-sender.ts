@@ -91,3 +91,65 @@ export function sendWhatsAppMessage(phoneNumber: string, invoice: WhatsAppInvoic
   const whatsappUrl = `https://wa.me/${fullPhone}?text=${encodedMessage}`
   window.open(whatsappUrl, "_blank")
 }
+
+export function formatPickupReadyMessage(invoice: WhatsAppInvoice): string {
+  const invoiceNumber = invoice.id || `INV-${Date.now()}`
+  const date = invoice.date || new Date().toISOString().split("T")[0]
+
+  let message = `🎉 *YOUR ORDER IS READY FOR PICKUP!*\n\n`
+  message += `Dear ${invoice.customerName || "Customer"},\n\n`
+  message += `We're pleased to inform you that your order is now ready for collection.\n\n`
+
+  message += `━━━━━━━━━━━━━━━━━━━━\n`
+  message += `📄 *ORDER DETAILS*\n`
+  message += `━━━━━━━━━━━━━━━━━━━━\n\n`
+
+  message += `*Invoice #:* ${invoiceNumber}\n`
+  message += `*Order Date:* ${date}\n\n`
+
+  message += `━━━━━━━━━━━━━━━━━━━━\n`
+  message += `*ITEMS*\n`
+  message += `━━━━━━━━━━━━━━━━━━━━\n\n`
+
+  invoice.items.forEach((item, index) => {
+    message += `${index + 1}. ${item.name} (Qty: ${item.quantity})\n`
+  })
+
+  message += `\n━━━━━━━━━━━━━━━━━━━━\n`
+  message += `*PAYMENT SUMMARY*\n`
+  message += `━━━━━━━━━━━━━━━━━━━━\n\n`
+
+  message += `Total Amount: NPR ${invoice.subtotal.toLocaleString()}\n`
+  message += `Paid: NPR ${invoice.advance.toLocaleString()}\n`
+
+  if (invoice.remaining > 0) {
+    message += `*Amount Due: NPR ${invoice.remaining.toLocaleString()}*\n\n`
+    message += `⚠️ Please bring the remaining payment when collecting your order.\n\n`
+
+    message += `*Payment Options:*\n`
+    message += `💳 Esewa: 9869317165\n`
+    message += `💳 Khalti: 9869317165\n`
+    message += `💵 Cash on pickup\n\n`
+  } else {
+    message += `✅ *Fully Paid*\n\n`
+  }
+
+  message += `━━━━━━━━━━━━━━━━━━━━\n\n`
+  message += `📍 Visit us at our location during business hours.\n`
+  message += `📞 Contact: 9869317165\n\n`
+  message += `Thank you for choosing us!\n\n`
+  message += `_Powered by Exarse Billing Software_\n`
+
+  return message
+}
+
+export function sendPickupReadyMessage(phoneNumber: string, invoice: WhatsAppInvoice) {
+  const message = formatPickupReadyMessage(invoice)
+  const encodedMessage = encodeURIComponent(message)
+
+  const cleanPhone = phoneNumber.replace(/\D/g, "")
+  const fullPhone = cleanPhone.startsWith("977") ? cleanPhone : `977${cleanPhone}`
+
+  const whatsappUrl = `https://wa.me/${fullPhone}?text=${encodedMessage}`
+  window.open(whatsappUrl, "_blank")
+}
