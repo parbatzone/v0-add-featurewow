@@ -41,7 +41,7 @@ Status: ${invoice.status.toUpperCase()}
 📞 Viber: 9869317165
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Powered by Pratima Electronics Order Management System_
+_Powered by Exarse Billing Software_
   `.trim()
 
   const phoneNumber = invoice.customerPhone?.startsWith("977") ? invoice.customerPhone : `977${invoice.customerPhone}`

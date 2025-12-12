@@ -457,6 +457,10 @@ export function generateElectronicsInvoicePDF(invoice: any) {
           <span>Amarshing Chowk, Kageshwori Manohara - 07, Kathmandu</span>
         </div>
       </div>
+
+      <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #dee2e6; font-size: 9px; color: #999;">
+        Powered by <strong>Exarse Billing Software</strong>
+      </div>
     </body>
     </html>
   `

@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card"
 import { generateElectronicsInvoicePDF } from "@/lib/electronics-pdf-generator"
 import { sendElectronicsWhatsAppMessage } from "@/lib/electronics-whatsapp-sender"
 import { Plus, Trash2, Download, Send } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface DetailedBillFormProps {
   onSubmit: (invoice: any) => void
@@ -32,6 +33,7 @@ export function ElectronicsDetailedBillForm({ onSubmit, customers }: DetailedBil
   const [advance, setAdvance] = useState(0)
   const [status, setStatus] = useState<"paid" | "pending">("pending")
   const [lastInvoice, setLastInvoice] = useState<any>(null)
+  const { toast } = useToast()
 
   const addItem = () => {
     setItems([...items, { name: "", quantity: 1, rate: 0, total: 0 }])
@@ -60,7 +62,11 @@ export function ElectronicsDetailedBillForm({ onSubmit, customers }: DetailedBil
     e.preventDefault()
 
     if (items.some((item) => !item.name || item.quantity <= 0 || item.rate <= 0)) {
-      alert("Please fill in all item details correctly")
+      toast({
+        title: "Error",
+        description: "Please fill in all item details correctly",
+        variant: "destructive",
+      })
       return
     }
 
@@ -79,6 +85,11 @@ export function ElectronicsDetailedBillForm({ onSubmit, customers }: DetailedBil
     onSubmit(invoice)
     setLastInvoice({ ...invoice, id: `ELEC-${Date.now()}`, date: new Date().toISOString().split("T")[0] })
 
+    toast({
+      title: "Success!",
+      description: "Electronics bill created successfully",
+    })
+
     setCustomerPhone("")
     setCustomerName("")
     setItems([{ name: "", quantity: 1, rate: 0, total: 0 }])
@@ -90,7 +101,10 @@ export function ElectronicsDetailedBillForm({ onSubmit, customers }: DetailedBil
   const handleSendWhatsApp = () => {
     if (!lastInvoice) return
     sendElectronicsWhatsAppMessage(lastInvoice)
-    // Clear the last invoice after sending to prevent duplicate sends
+    toast({
+      title: "Opening WhatsApp",
+      description: "WhatsApp will open with the bill message",
+    })
     setTimeout(() => setLastInvoice(null), 2000)
   }
 

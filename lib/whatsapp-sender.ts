@@ -72,7 +72,7 @@ export function formatInvoiceForWhatsApp(invoice: WhatsAppInvoice): string {
   message += `📞 Phone: 9869317165\n\n`
 
   message += `━━━━━━━━━━━━━━━━━━━━\n\n`
-  message += `_Powered by Pixel Production Order Management System_\n`
+  message += `_Powered by Exarse Billing Software_\n`
 
   return message
 }

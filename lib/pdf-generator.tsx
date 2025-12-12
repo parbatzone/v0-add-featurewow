@@ -598,6 +598,10 @@ export function generateInvoicePDF(invoice: any) {
         </div>
       </div>
 
+      <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #dee2e6; font-size: 9px; color: #999;">
+        Powered by <strong>Exarse Billing Software</strong>
+      </div>
+
       ${orderInfoHTML}
     </body>
     </html>

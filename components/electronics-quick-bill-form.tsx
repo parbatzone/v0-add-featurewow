@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { generateElectronicsInvoicePDF } from "@/lib/electronics-pdf-generator"
 import { sendElectronicsWhatsAppMessage } from "@/lib/electronics-whatsapp-sender"
 import { Download, Send } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface QuickBillFormProps {
   onSubmit: (invoice: any) => void
@@ -21,6 +22,7 @@ export function ElectronicsQuickBillForm({ onSubmit }: QuickBillFormProps) {
   const [advance, setAdvance] = useState("")
   const [status, setStatus] = useState<"paid" | "pending">("pending")
   const [lastInvoice, setLastInvoice] = useState<any>(null)
+  const { toast } = useToast()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,7 +31,11 @@ export function ElectronicsQuickBillForm({ onSubmit }: QuickBillFormProps) {
     const advanceNum = Number.parseFloat(advance)
 
     if (isNaN(subtotalNum) || isNaN(advanceNum)) {
-      alert("Please enter valid numbers")
+      toast({
+        title: "Error",
+        description: "Please enter valid numbers",
+        variant: "destructive",
+      })
       return
     }
 
@@ -46,6 +52,11 @@ export function ElectronicsQuickBillForm({ onSubmit }: QuickBillFormProps) {
     onSubmit(invoice)
     setLastInvoice({ ...invoice, id: `ELEC-${Date.now()}`, date: new Date().toISOString().split("T")[0] })
 
+    toast({
+      title: "Success!",
+      description: "Quick bill created successfully",
+    })
+
     setCustomerPhone("")
     setSubtotal("")
     setAdvance("")
@@ -55,7 +66,10 @@ export function ElectronicsQuickBillForm({ onSubmit }: QuickBillFormProps) {
   const handleSendWhatsApp = () => {
     if (!lastInvoice) return
     sendElectronicsWhatsAppMessage(lastInvoice)
-    // Clear the last invoice after sending to prevent duplicate sends
+    toast({
+      title: "Opening WhatsApp",
+      description: "WhatsApp will open with the bill message",
+    })
     setTimeout(() => setLastInvoice(null), 2000)
   }
 

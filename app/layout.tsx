@@ -17,8 +17,8 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: "Pixel Production - Photo Studio Billing",
-  description: "Professional dark-themed billing software for Pixel Production photo studio",
+  title: "Exarse Billing Software",
+  description: "Professional billing software for photo studios and electronics shops - Powered by Exarse",
   generator: "v0.app",
 }
 
