@@ -200,10 +200,19 @@ export default function PhotoStudioBilling() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
+      <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
+              {/* Exarse Logo and Branding */}
+              <div className="flex items-center gap-3">
+                <img src="/images/exarse-logo.png" alt="Exarse Billing Software" className="h-10 w-auto" />
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Exarse</h1>
+                  <p className="text-xs text-muted-foreground">Billing Software</p>
+                </div>
+              </div>
+
               {/* Shop Selector */}
               <div className="flex gap-2 bg-secondary/50 p-1 rounded-lg">
                 <button
@@ -232,22 +241,15 @@ export default function PhotoStudioBilling() {
                 </button>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
-                  {selectedShop === "photo" ? (
-                    <Camera className="w-5 h-5 text-primary-foreground" />
-                  ) : (
-                    <Zap className="w-5 h-5 text-primary-foreground" />
-                  )}
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground">
-                    {selectedShop === "photo" ? "Pixel Production" : "Pratima Electronics"}
-                  </h1>
-                  <p className="text-xs text-muted-foreground">
-                    {selectedShop === "photo" ? "Professional Billing Software" : "Electronics Billing System"}
-                  </p>
-                </div>
+              <div className="hidden lg:flex items-center gap-2 px-3 py-2 bg-muted/50 rounded-lg">
+                {selectedShop === "photo" ? (
+                  <Camera className="w-4 h-4 text-primary" />
+                ) : (
+                  <Zap className="w-4 h-4 text-primary" />
+                )}
+                <span className="text-sm font-medium text-foreground">
+                  {selectedShop === "photo" ? "Pixel Production" : "Pratima Electronics"}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-3">
