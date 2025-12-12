@@ -184,7 +184,10 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
                     <Badge variant={invoice.type === "quick" ? "secondary" : "outline"}>
                       {invoice.type === "quick" ? "Quick" : "Detailed"}
                     </Badge>
-                    <Badge variant={invoice.status === "paid" ? "default" : "destructive"}>
+                    <Badge
+                      variant={invoice.status === "paid" ? "default" : "destructive"}
+                      className={invoice.status === "pending" ? "bg-red-600 text-white hover:bg-red-700" : ""}
+                    >
                       {invoice.status.toUpperCase()}
                     </Badge>
                   </div>
@@ -206,7 +209,7 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="bg-green-500/10 hover:bg-green-500/20 text-green-600 border-green-500/30"
+                      className="bg-green-600 hover:bg-green-700 text-white border-green-600"
                       onClick={() => notifyCustomer(invoice)}
                       disabled={!invoice.customerPhone}
                     >
@@ -218,7 +221,11 @@ export function InvoiceHistory({ invoices, setInvoices }: InvoiceHistoryProps) {
                       PDF
                     </Button>
                     {invoice.status === "pending" && (
-                      <Button size="sm" onClick={() => markAsPaid(invoice.id)}>
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => markAsPaid(invoice.id)}
+                      >
                         Mark Paid
                       </Button>
                     )}

@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: 220 15% 97%;
+  --background: 0 0% 100%;
   --foreground: 220 20% 15%;
   --card: 0 0% 100%;
   --card-foreground: 220 20% 15%;
@@ -39,26 +39,35 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Dark theme with Exarse colors - navy blue background and light text */
+/* Dark theme with Exarse navy blue and proper contrast */
 .dark {
-  --background: 215 25% 12%;
-  --foreground: 0 0% 98%;
-  --card: 215 20% 16%;
-  --card-foreground: 0 0% 98%;
-  --popover: 215 20% 16%;
-  --popover-foreground: 0 0% 98%;
+  /* Dark navy blue background (#0F2744) */
+  --background: 215 50% 12%;
+  /* Light text for readability */
+  --foreground: 0 0% 95%;
+  /* Card backgrounds slightly lighter than body */
+  --card: 215 40% 16%;
+  --card-foreground: 0 0% 95%;
+  --popover: 215 40% 16%;
+  --popover-foreground: 0 0% 95%;
+  /* Green accent color (#4CAF50) */
   --primary: 145 65% 50%;
-  --primary-foreground: 215 25% 12%;
-  --secondary: 215 15% 22%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 215 15% 20%;
-  --muted-foreground: 0 0% 70%;
+  --primary-foreground: 215 50% 12%;
+  /* Secondary dark blue-gray */
+  --secondary: 215 25% 24%;
+  --secondary-foreground: 0 0% 95%;
+  /* Muted backgrounds and text */
+  --muted: 215 25% 20%;
+  --muted-foreground: 0 0% 65%;
+  /* Accent green */
   --accent: 145 65% 50%;
-  --accent-foreground: 215 25% 12%;
-  --destructive: 0 65% 55%;
+  --accent-foreground: 215 50% 12%;
+  /* Red for pending/destructive */
+  --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 98%;
-  --border: 215 15% 28%;
-  --input: 215 15% 22%;
+  /* Borders */
+  --border: 215 25% 28%;
+  --input: 215 25% 22%;
   --ring: 145 65% 50%;
   --chart-1: 145 65% 50%;
   --chart-2: 200 70% 55%;
@@ -123,6 +132,16 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
 @media print {
