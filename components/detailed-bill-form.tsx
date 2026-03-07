@@ -71,8 +71,14 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
 
   const updateItem = (index: number, field: keyof Item, value: string | number) => {
     const newItems = [...items]
-    const numValue = typeof value === "string" ? parseFloat(value) || 0 : value
-    newItems[index] = { ...newItems[index], [field]: numValue }
+    
+    // For name field, keep it as string. For numeric fields, convert to number
+    if (field === "name") {
+      newItems[index] = { ...newItems[index], [field]: value as string }
+    } else {
+      const numValue = typeof value === "string" ? parseFloat(value) || 0 : value
+      newItems[index] = { ...newItems[index], [field]: numValue }
+    }
 
     if (field === "quantity" || field === "rate") {
       newItems[index].total = newItems[index].quantity * newItems[index].rate
