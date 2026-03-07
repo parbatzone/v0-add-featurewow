@@ -156,7 +156,7 @@ export function PoliceReportPending() {
               <Label htmlFor="report-password">Password *</Label>
               <Input
                 id="report-password"
-                type="password"
+                type="text"
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -193,6 +193,9 @@ export function PoliceReportPending() {
                       </div>
                       <div>
                         <span className="text-muted-foreground">Email:</span> {report.email}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Password:</span> {report.password}
                       </div>
                       <div>
                         <span className="text-muted-foreground">Status:</span>
