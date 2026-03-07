@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Camera, FileText, TrendingUp, Users, Plus, Search, Send, ShoppingCart, Package, Zap } from "lucide-react"
+import { Camera, FileText, TrendingUp, Users, Plus, Search, Send, ShoppingCart, Package, Zap, AlertCircle } from "lucide-react"
 import { QuickBillForm } from "@/components/quick-bill-form"
 import { DetailedBillForm } from "@/components/detailed-bill-form"
 import { InvoiceHistory } from "@/components/invoice-history"
@@ -14,6 +14,7 @@ import LabManagement from "@/components/lab-management"
 import ShoppingList from "@/components/shopping-list"
 import PendingOrders from "@/components/pending-orders"
 import { AnalyticsDashboard } from "@/components/analytics-dashboard"
+import { PoliceReportPending } from "@/components/police-report-pending"
 import { ElectronicsQuickBillForm } from "@/components/electronics-quick-bill-form"
 import { ElectronicsDetailedBillForm } from "@/components/electronics-detailed-bill-form"
 import { ElectronicsInvoiceHistory } from "@/components/electronics-invoice-history"
@@ -270,7 +271,7 @@ export default function PhotoStudioBilling() {
       <main className="container mx-auto px-4 py-6">
         {selectedShop === "photo" ? (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-8 lg:w-fit lg:grid-cols-8 bg-muted p-1">
+            <TabsList className="grid w-full grid-cols-9 lg:w-fit lg:grid-cols-9 bg-muted p-1">
               <TabsTrigger value="dashboard" className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
                 Dashboard
@@ -302,6 +303,10 @@ export default function PhotoStudioBilling() {
               <TabsTrigger value="shopping" className="flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4" />
                 Shopping
+              </TabsTrigger>
+              <TabsTrigger value="police-report" className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" />
+                Police Report
               </TabsTrigger>
             </TabsList>
 
@@ -360,6 +365,10 @@ export default function PhotoStudioBilling() {
 
             <TabsContent value="shopping">
               <ShoppingList />
+            </TabsContent>
+
+            <TabsContent value="police-report">
+              <PoliceReportPending />
             </TabsContent>
           </Tabs>
         ) : (

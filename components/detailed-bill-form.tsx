@@ -35,6 +35,7 @@ interface Item {
 
 export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps) {
   const [customerPhone, setCustomerPhone] = useState("")
+  const [customerEmail, setCustomerEmail] = useState("")
   const [customerName, setCustomerName] = useState("")
   const [items, setItems] = useState<Item[]>([{ name: "", quantity: 1, rate: 0, total: 0 }])
   const [advance, setAdvance] = useState("")
@@ -43,9 +44,14 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
   const [photoNumber, setPhotoNumber] = useState("")
   const [isLabPhoto, setIsLabPhoto] = useState(false)
   const [addToOrders, setAddToOrders] = useState(false)
+  const [sendViaEmail, setSendViaEmail] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [lastCreatedInvoice, setLastCreatedInvoice] = useState<any>(null)
   const { toast } = useToast()
+
+  const handleNumberInputWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    e.currentTarget.blur()
+  }
 
   const subtotal = items.reduce((sum, item) => sum + item.total, 0)
   const discountAmount = Number.parseFloat(discount || "0")
@@ -65,7 +71,8 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
 
   const updateItem = (index: number, field: keyof Item, value: string | number) => {
     const newItems = [...items]
-    newItems[index] = { ...newItems[index], [field]: value }
+    const numValue = typeof value === "string" ? parseFloat(value) || 0 : value
+    newItems[index] = { ...newItems[index], [field]: numValue }
 
     if (field === "quantity" || field === "rate") {
       newItems[index].total = newItems[index].quantity * newItems[index].rate
@@ -263,7 +270,7 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
           <CardTitle className="text-lg">Customer Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="customer-phone">Customer Phone</Label>
               <Input
@@ -271,6 +278,16 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
                 placeholder="98XXXXXXXX"
                 value={customerPhone}
                 onChange={(e) => handleCustomerPhoneChange(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="customer-email">Customer Email (Optional)</Label>
+              <Input
+                id="customer-email"
+                type="email"
+                placeholder="customer@example.com"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -315,6 +332,7 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
                   min="1"
                   value={item.quantity}
                   onChange={(e) => updateItem(index, "quantity", Number.parseInt(e.target.value) || 1)}
+                  onWheel={handleNumberInputWheel}
                 />
               </div>
               <div className="space-y-2">
@@ -325,6 +343,7 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
                   step="0.01"
                   value={item.rate}
                   onChange={(e) => updateItem(index, "rate", Number.parseFloat(e.target.value) || 0)}
+                  onWheel={handleNumberInputWheel}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -387,10 +406,10 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       {/* Order Information */}
       <Card className="bg-muted/20">
         <CardHeader>
-          <CardTitle className="text-lg">Order Information</CardTitle>
+          <CardTitle className="text-lg">Order Information & Delivery</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
+        <CardContent className="space-y-4">
+          <div className="flex items-center space-x-2">
             <Checkbox
               id="create-order-info"
               checked={createOrderInfo}
@@ -417,6 +436,18 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
               </p>
             </div>
           )}
+
+          <div className="flex items-center space-x-2 pt-2 border-t">
+            <Checkbox
+              id="send-via-email"
+              checked={sendViaEmail}
+              onCheckedChange={(checked) => setSendViaEmail(checked as boolean)}
+              disabled={!customerEmail}
+            />
+            <Label htmlFor="send-via-email" className="text-sm font-medium">
+              Send Bill via Email {!customerEmail && "(Add email first)"}
+            </Label>
+          </div>
         </CardContent>
       </Card>
 
