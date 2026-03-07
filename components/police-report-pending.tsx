@@ -6,42 +6,44 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
-import { Plus, Trash2, AlertCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, Trash2, AlertCircle, Send } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface PoliceReport {
   id: string
   name: string
-  description: string
-  details: string
+  phoneNumber: string
+  email: string
+  password: string
+  status: "accepted" | "rejected" | "done"
   date: string
-  status: "pending" | "resolved"
 }
 
 export function PoliceReportPending() {
   const [reports, setReports] = useState<PoliceReport[]>([])
   const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [details, setDetails] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const { toast } = useToast()
 
   useEffect(() => {
-    const saved = localStorage.getItem("police-reports")
+    const saved = localStorage.getItem("police-reports-pending")
     if (saved) {
       setReports(JSON.parse(saved))
     }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("police-reports", JSON.stringify(reports))
+    localStorage.setItem("police-reports-pending", JSON.stringify(reports))
   }, [reports])
 
   const handleAddReport = () => {
-    if (!name.trim() || !description.trim()) {
+    if (!name.trim() || !phoneNumber.trim() || !email.trim() || !password.trim()) {
       toast({
         title: "Error",
-        description: "Please fill in name and description",
+        description: "Please fill in all required fields",
         variant: "destructive",
       })
       return
@@ -50,17 +52,18 @@ export function PoliceReportPending() {
     const newReport: PoliceReport = {
       id: `report-${Date.now()}`,
       name: name.trim(),
-      description: description.trim(),
-      details: details.trim(),
+      phoneNumber: phoneNumber.trim(),
+      email: email.trim(),
+      password: password.trim(),
+      status: "accepted",
       date: new Date().toISOString().split("T")[0],
-      status: "pending",
     }
 
     setReports([newReport, ...reports])
-
     setName("")
-    setDescription("")
-    setDetails("")
+    setPhoneNumber("")
+    setEmail("")
+    setPassword("")
 
     toast({
       title: "Success",
@@ -76,10 +79,37 @@ export function PoliceReportPending() {
     })
   }
 
-  const handleMarkResolved = (id: string) => {
-    setReports(
-      reports.map((r) => (r.id === id ? { ...r, status: "resolved" as const } : r))
-    )
+  const handleStatusChange = (id: string, newStatus: "accepted" | "rejected" | "done") => {
+    const report = reports.find((r) => r.id === id)
+    if (report && newStatus === "done") {
+      sendWhatsAppNotification(report)
+    }
+    setReports(reports.map((r) => (r.id === id ? { ...r, status: newStatus } : r)))
+  }
+
+  const sendWhatsAppNotification = (report: PoliceReport) => {
+    const message = `🎉 Your police report is ready!\n\nName: ${report.name}\nDate: ${report.date}\n\nThank you for using Exarse Billing Software!`
+    const encodedMessage = encodeURIComponent(message)
+    const whatsappUrl = `https://wa.me/977${report.phoneNumber.replace(/^0/, "")}?text=${encodedMessage}`
+    window.open(whatsappUrl, "_blank")
+    
+    toast({
+      title: "WhatsApp Opened",
+      description: "Police report notification ready to send",
+    })
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "accepted":
+        return "bg-green-100 text-green-800"
+      case "rejected":
+        return "bg-red-100 text-red-800"
+      case "done":
+        return "bg-blue-100 text-blue-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
   }
 
   return (
@@ -90,35 +120,48 @@ export function PoliceReportPending() {
           <CardTitle>Add Police Report</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="report-name">Name / Case Reference *</Label>
-            <Input
-              id="report-name"
-              placeholder="e.g., FIR #2025-001, Case Name, etc."
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="report-name">Name *</Label>
+              <Input
+                id="report-name"
+                placeholder="Full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="report-description">Description *</Label>
-            <Input
-              id="report-description"
-              placeholder="Brief description of the case"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="report-phone">Phone Number *</Label>
+              <Input
+                id="report-phone"
+                placeholder="98XXXXXXXX"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="report-details">Additional Details</Label>
-            <Textarea
-              id="report-details"
-              placeholder="Add any additional information..."
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-              rows={3}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="report-email">Email *</Label>
+              <Input
+                id="report-email"
+                type="email"
+                placeholder="email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="report-password">Password *</Label>
+              <Input
+                id="report-password"
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
           </div>
 
           <Button onClick={handleAddReport} className="w-full">
@@ -132,35 +175,54 @@ export function PoliceReportPending() {
       {reports.length > 0 ? (
         <div className="space-y-3">
           <h3 className="font-semibold flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            Pending Reports ({reports.filter((r) => r.status === "pending").length})
+            <AlertCircle className="w-5 h-5" />
+            Police Reports ({reports.length})
           </h3>
           {reports.map((report) => (
-            <Card key={report.id} className={report.status === "resolved" ? "opacity-60" : ""}>
+            <Card key={report.id}>
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
                       <h4 className="font-semibold">{report.name}</h4>
-                      <Badge variant={report.status === "pending" ? "destructive" : "secondary"}>
-                        {report.status === "pending" ? "Pending" : "Resolved"}
-                      </Badge>
                       <span className="text-xs text-muted-foreground">{report.date}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">{report.description}</p>
-                    {report.details && (
-                      <p className="text-sm whitespace-pre-wrap text-muted-foreground">{report.details}</p>
-                    )}
+                    <div className="grid gap-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Phone:</span> {report.phoneNumber}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Email:</span> {report.email}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Status:</span>
+                        <div className="mt-2">
+                          <Select value={report.status} onValueChange={(value) => 
+                            handleStatusChange(report.id, value as "accepted" | "rejected" | "done")
+                          }>
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="accepted">Accepted</SelectItem>
+                              <SelectItem value="rejected">Rejected</SelectItem>
+                              <SelectItem value="done">Done</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {report.status === "pending" && (
+                    {report.status === "done" && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleMarkResolved(report.id)}
+                        onClick={() => sendWhatsAppNotification(report)}
                         className="text-green-600 hover:text-green-700"
                       >
-                        Mark Resolved
+                        <Send className="w-4 h-4 mr-1" />
+                        Send WhatsApp
                       </Button>
                     )}
                     <Button
@@ -180,7 +242,7 @@ export function PoliceReportPending() {
       ) : (
         <Card>
           <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">No police reports pending</p>
+            <p className="text-muted-foreground">No police reports added yet</p>
           </CardContent>
         </Card>
       )}
