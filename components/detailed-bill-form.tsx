@@ -14,6 +14,7 @@ import { Plus, Trash2, FileText, Download, MessageCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { generateInvoicePDF } from "@/lib/pdf-generator"
 import { sendWhatsAppMessage } from "@/lib/whatsapp-sender"
+import { sendEmailInvoice } from "@/lib/email-sender"
 
 interface DetailedBillFormProps {
   onSubmit: (invoice: any) => void
@@ -200,11 +201,33 @@ export function DetailedBillForm({ onSubmit, customers }: DetailedBillFormProps)
       successMessage += " and added to pending orders"
     }
 
+    // Send email if checkbox is selected
+    if (sendViaEmail && customerEmail) {
+      const emailSent = sendEmailInvoice(customerEmail, invoice)
+      if (emailSent) {
+        successMessage += " and sent via email"
+      } else {
+        successMessage += " (email sending failed)"
+      }
+    }
+
     toast({
       title: "Success!",
       description: successMessage,
     })
 
+    // Reset form
+    setCustomerPhone("")
+    setCustomerEmail("")
+    setCustomerName("")
+    setItems([{ name: "", quantity: 1, rate: 0, total: 0 }])
+    setAdvance("")
+    setDiscount("")
+    setCreateOrderInfo(false)
+    setPhotoNumber("")
+    setIsLabPhoto(false)
+    setAddToOrders(false)
+    setSendViaEmail(false)
     setIsSubmitting(false)
   }
 

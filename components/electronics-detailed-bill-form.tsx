@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card } from "@/components/ui/card"
 import { generateElectronicsInvoicePDF } from "@/lib/electronics-pdf-generator"
 import { sendElectronicsWhatsAppMessage } from "@/lib/electronics-whatsapp-sender"
+import { sendEmailInvoice } from "@/lib/email-sender"
 import { Plus, Trash2, Download, Send } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
