@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { ShoppingCart, Plus, Trash2, Package, AlertCircle, CheckCircle2 } from "lucide-react"
+import { ShoppingCart, Plus, Trash2, Package, AlertCircle, CheckCircle2, Printer } from "lucide-react"
+import { generateShoppingListPDF } from "@/lib/shopping-list-pdf-generator"
 
 interface ShoppingItem {
   id: string
@@ -137,13 +138,22 @@ export default function ShoppingList() {
           <h2 className="text-2xl font-bold text-emerald-800">Shopping List</h2>
           <p className="text-emerald-600">Manage inventory and supplies for your studio</p>
         </div>
-        <Dialog open={isAddingItem} onOpenChange={setIsAddingItem}>
-          <DialogTrigger asChild>
-            <Button className="bg-emerald-600 hover:bg-emerald-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Item
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => generateShoppingListPDF(shoppingItems)}
+            className="bg-blue-600 hover:bg-blue-700"
+            disabled={shoppingItems.length === 0}
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Print List
+          </Button>
+          <Dialog open={isAddingItem} onOpenChange={setIsAddingItem}>
+            <DialogTrigger asChild>
+              <Button className="bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Item
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Add New Item</DialogTitle>
@@ -245,9 +255,9 @@ export default function ShoppingList() {
               <Button onClick={addShoppingItem} className="bg-emerald-600 hover:bg-emerald-700">
                 Add Item
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              </DialogTrigger>
+            </Dialog>
+        </div>
       </div>
 
       {/* Summary Cards */}
