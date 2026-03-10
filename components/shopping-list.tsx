@@ -154,109 +154,110 @@ export default function ShoppingList() {
                 Add Item
               </Button>
             </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Add New Item</DialogTitle>
-              <DialogDescription>Add a new item to your shopping list</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div>
-                <Label htmlFor="itemName">Item Name</Label>
-                <Input
-                  id="itemName"
-                  value={newItem.name}
-                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                  placeholder="e.g., Camera Battery, Photo Paper"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Add New Item</DialogTitle>
+                <DialogDescription>Add a new item to your shopping list</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
                 <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Select onValueChange={(value) => setNewItem({ ...newItem, category: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="equipment">Equipment</SelectItem>
-                      <SelectItem value="supplies">Supplies</SelectItem>
-                      <SelectItem value="software">Software</SelectItem>
-                      <SelectItem value="maintenance">Maintenance</SelectItem>
-                      <SelectItem value="office">Office Supplies</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="priority">Priority</Label>
-                  <Select
-                    onValueChange={(value: "low" | "medium" | "high") => setNewItem({ ...newItem, priority: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="quantity">Quantity</Label>
+                  <Label htmlFor="itemName">Item Name</Label>
                   <Input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    value={newItem.quantity}
-                    onChange={(e) => setNewItem({ ...newItem, quantity: Number.parseInt(e.target.value) })}
+                    id="itemName"
+                    value={newItem.name}
+                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                    placeholder="e.g., Camera Battery, Photo Paper"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="unit">Unit</Label>
-                  <Select onValueChange={(value) => setNewItem({ ...newItem, unit: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pieces">Pieces</SelectItem>
-                      <SelectItem value="boxes">Boxes</SelectItem>
-                      <SelectItem value="packs">Packs</SelectItem>
-                      <SelectItem value="rolls">Rolls</SelectItem>
-                      <SelectItem value="bottles">Bottles</SelectItem>
-                      <SelectItem value="kg">Kg</SelectItem>
-                      <SelectItem value="meters">Meters</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="category">Category</Label>
+                    <Select onValueChange={(value) => setNewItem({ ...newItem, category: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="equipment">Equipment</SelectItem>
+                        <SelectItem value="supplies">Supplies</SelectItem>
+                        <SelectItem value="software">Software</SelectItem>
+                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="office">Office Supplies</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="priority">Priority</Label>
+                    <Select
+                      onValueChange={(value: "low" | "medium" | "high") => setNewItem({ ...newItem, priority: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="quantity">Quantity</Label>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min="1"
+                      value={newItem.quantity}
+                      onChange={(e) => setNewItem({ ...newItem, quantity: Number.parseInt(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="unit">Unit</Label>
+                    <Select onValueChange={(value) => setNewItem({ ...newItem, unit: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pieces">Pieces</SelectItem>
+                        <SelectItem value="boxes">Boxes</SelectItem>
+                        <SelectItem value="packs">Packs</SelectItem>
+                        <SelectItem value="rolls">Rolls</SelectItem>
+                        <SelectItem value="bottles">Bottles</SelectItem>
+                        <SelectItem value="kg">Kg</SelectItem>
+                        <SelectItem value="meters">Meters</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="estimatedPrice">Price (NPR)</Label>
+                    <Input
+                      id="estimatedPrice"
+                      type="number"
+                      min="0"
+                      value={newItem.estimatedPrice}
+                      onChange={(e) => setNewItem({ ...newItem, estimatedPrice: Number.parseFloat(e.target.value) })}
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label htmlFor="estimatedPrice">Price (NPR)</Label>
-                  <Input
-                    id="estimatedPrice"
-                    type="number"
-                    min="0"
-                    value={newItem.estimatedPrice}
-                    onChange={(e) => setNewItem({ ...newItem, estimatedPrice: Number.parseFloat(e.target.value) })}
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea
+                    id="notes"
+                    value={newItem.notes}
+                    onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
+                    placeholder="Brand preferences, specifications, etc."
                   />
                 </div>
               </div>
-              <div>
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea
-                  id="notes"
-                  value={newItem.notes}
-                  onChange={(e) => setNewItem({ ...newItem, notes: e.target.value })}
-                  placeholder="Brand preferences, specifications, etc."
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button onClick={addShoppingItem} className="bg-emerald-600 hover:bg-emerald-700">
-                Add Item
-              </Button>
-              </DialogTrigger>
-            </Dialog>
+              <DialogFooter>
+                <Button onClick={addShoppingItem} className="bg-emerald-600 hover:bg-emerald-700">
+                  Add Item
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
